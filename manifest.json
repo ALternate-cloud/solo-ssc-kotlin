@@ -1,18 +1,68 @@
 {
+  "id": "com.sololeveling.ssc",
   "name": "Solo Leveling SSC CGL System",
   "short_name": "Solo SSC",
   "description": "Level Up Your SSC CGL Preparation with Real CBT Mocks, Procedural Questions & Monarch System",
-  "start_url": "./index.html",
+  "lang": "en",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "orientation": "portrait",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
   "background_color": "#060a14",
   "theme_color": "#00f2ff",
+  "categories": ["education", "productivity"],
   "icons": [
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23060a14'/%3E%3Ccircle cx='256' cy='256' r='200' stroke='%2300f2ff' stroke-width='16' fill='%230d162b'/%3E%3Ctext x='50%25' y='55%25' font-size='160' text-anchor='middle' fill='%23ffd700' font-family='sans-serif' font-weight='900'%3E👑%3C/text%3E%3Ctext x='50%25' y='78%25' font-size='42' text-anchor='middle' fill='%2300f2ff' font-family='sans-serif' font-weight='bold' letter-spacing='4'%3ESSC CGL%3C/text%3E%3C/svg%3E",
-      "sizes": "192x192 512x512",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/maskable-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/icons/screenshot-desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Solo Leveling SSC CGL Preparation Desktop HUD"
+    },
+    {
+      "src": "/icons/screenshot-mobile.png",
+      "sizes": "720x1280",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Solo Leveling SSC CGL Mobile App View"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "CBT Mock Tests",
+      "short_name": "Mocks",
+      "description": "Attempt official SSC CGL Previous Year CBT Mock Tests",
+      "url": "/#tab-dungeons",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Question Vault",
+      "short_name": "Vault",
+      "description": "Practice infinite procedural questions",
+      "url": "/#tab-vault",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
     }
   ]
 }
