@@ -1,11 +1,21 @@
 // Service Worker for Solo Leveling SSC CGL PWA / APK
-const CACHE_NAME = 'solo-leveling-ssc-v2';
+const CACHE_NAME = 'solo-leveling-ssc-v3';
+const OFFLINE_URL = '/offline.html';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
+  '/offline.html',
   '/manifest.json',
+  '/icons/icon-72.png',
+  '/icons/icon-96.png',
+  '/icons/icon-128.png',
+  '/icons/icon-144.png',
+  '/icons/icon-152.png',
   '/icons/icon-192.png',
+  '/icons/icon-256.png',
+  '/icons/icon-384.png',
   '/icons/icon-512.png',
+  '/icons/maskable-icon-192.png',
   '/icons/maskable-icon-512.png',
   '/icons/screenshot-desktop.png',
   '/icons/screenshot-mobile.png',
@@ -31,7 +41,7 @@ const ASSETS_TO_CACHE = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE).catch((err) => console.warn('Cache addAll warning:', err));
+      return cache.addAll(ASSETS_TO_CACHE).catch((err) => console.warn('Cache warning:', err));
     })
   );
   self.skipWaiting();
@@ -53,23 +63,32 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Always fetch dynamic API endpoints from network
+  // Always allow API calls to go directly to network
   if (event.request.url.includes('/api/')) {
     return;
   }
 
+  // If navigating to a page, try network -> cache -> offline fallback
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request).catch(() => {
+        return caches.match(event.request).then((res) => res || caches.match(OFFLINE_URL));
+      })
+    );
+    return;
+  }
+
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        // Fetch in background to update cache
-        fetch(event.request).then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, networkResponse));
+    caches.match(event.request).then((cached) => {
+      if (cached) {
+        fetch(event.request).then((fresh) => {
+          if (fresh && fresh.status === 200) {
+            caches.open(CACHE_NAME).then((c) => c.put(event.request, fresh));
           }
         }).catch(() => {});
-        return cachedResponse;
+        return cached;
       }
       return fetch(event.request);
-    }).catch(() => fetch(event.request))
+    }).catch(() => caches.match(OFFLINE_URL))
   );
 });

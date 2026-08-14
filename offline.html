@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offline Mode - Solo Leveling Exam System</title>
+  <style>
+    body {
+      background: #060a14;
+      color: #e2e8f0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      text-align: center;
+      padding: 20px;
+    }
+    .offline-card {
+      background: rgba(13, 22, 43, 0.9);
+      border: 2px solid #00f2ff;
+      border-radius: 8px;
+      padding: 32px 24px;
+      max-width: 440px;
+      box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
+    }
+    h1 {
+      color: #00f2ff;
+      font-size: 1.5rem;
+      margin: 12px 0;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    p {
+      color: #94a3b8;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    button {
+      background: #00f2ff;
+      color: #060a14;
+      border: none;
+      padding: 12px 24px;
+      font-weight: bold;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 16px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    button:hover {
+      background: #38bdf8;
+    }
+  </style>
+</head>
+<body>
+  <div class="offline-card">
+    <div style="font-size: 3rem;">⚡</div>
+    <h1>System Dungeon Offline</h1>
+    <p>You are currently disconnected from the Monarch Network. Your offline local progress and cached question bank remain available.</p>
+    <button onclick="window.location.reload()">Re-Enter System ⚔️</button>
+  </div>
+</body>
+</html>
