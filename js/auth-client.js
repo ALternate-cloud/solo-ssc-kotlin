@@ -7,7 +7,9 @@ class AuthClientEngine {
     this.token = localStorage.getItem('solo_system_jwt_token') || null;
     this.currentUser = this.loadSavedUser();
     this.isSyncing = false;
-    this.apiBase = window.location.origin;
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const isAppOrigin = window.location.origin.startsWith('file:') || window.location.origin.startsWith('capacitor:') || window.location.origin.startsWith('ionic:') || window.location.origin.startsWith('http://localhost');
+    this.apiBase = (!isLocalhost && window.location.origin.includes('onrender.com')) ? window.location.origin : 'https://solo-leveling-ssc.onrender.com';
 
     // Check session on load
     if (this.token) {

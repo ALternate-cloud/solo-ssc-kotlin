@@ -6,7 +6,8 @@ class AdminGuildMasterPortal {
   constructor() {
     this.aspirants = [];
     this.stats = null;
-    this.apiBase = window.location.origin;
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    this.apiBase = (!isLocalhost && window.location.origin.includes('onrender.com')) ? window.location.origin : 'https://solo-leveling-ssc.onrender.com';
   }
 
   async fetchAspirantsData() {
