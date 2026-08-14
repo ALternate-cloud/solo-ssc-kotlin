@@ -1,5 +1,5 @@
 {
-  "id": "com.sololeveling.ssc",
+  "id": "https://solo-leveling-ssc.onrender.com/",
   "name": "Solo Leveling SSC CGL System",
   "short_name": "Solo SSC",
   "description": "Level Up Your SSC CGL Preparation with Real CBT Mocks, Procedural Questions & Monarch System",
@@ -8,12 +8,14 @@
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "display_override": ["standalone", "minimal-ui", "browser"],
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
   "orientation": "any",
   "background_color": "#060a14",
   "theme_color": "#00f2ff",
   "categories": ["education", "productivity", "utilities"],
   "prefer_related_applications": false,
+  "related_applications": [],
+  "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7",
   "icons": [
     {
       "src": "/icons/icon-72.png",
@@ -112,6 +114,64 @@
       "description": "Practice infinite procedural questions",
       "url": "/#tab-vault",
       "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "launch_handler": {
+    "client_mode": ["navigate-existing", "auto"]
+  },
+  "share_target": {
+    "action": "/#tab-vault",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
+  "file_handlers": [
+    {
+      "action": "/#tab-vault",
+      "name": "SSC Study Notes",
+      "accept": {
+        "text/plain": [".txt", ".json"]
+      }
+    }
+  ],
+  "protocol_handlers": [
+    {
+      "protocol": "web+ssc",
+      "url": "/?quest=%s"
+    }
+  ],
+  "edge_side_panel": {
+    "preferred_width": 480
+  },
+  "note_taking": {
+    "new_note_url": "/#tab-focus"
+  },
+  "widgets": [
+    {
+      "name": "Daily Quest Tracker",
+      "short_name": "Quests",
+      "description": "Track daily SSC study quests",
+      "tag": "daily-quests",
+      "template": "quest-widget",
+      "ms_ac_template": "/widget.json",
+      "data": "/widget-data.json",
+      "type": "application/json",
+      "screenshots": [
+        {
+          "src": "/icons/screenshot-mobile.png",
+          "sizes": "720x1280",
+          "label": "Daily Quest Widget"
+        }
+      ],
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }
