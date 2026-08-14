@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>THE SYSTEM - Solo Leveling Exam Preparation HUD</title>
+  <meta name="description" content="Gamified Solo Leveling RPG exam preparation system for SSC CGL, CHSL, MTS, and competitive exams. Daily quests, Question Vault, Boss CBT Mocks, and ARISE error extraction.">
+  
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="css/system-theme.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <!-- Main System Application Shell -->
+  <div class="system-app-container">
+
+    <!-- TOP HUD BAR -->
+    <header class="system-top-hud hologram-corners">
+      <div class="hud-branding">
+        <div class="system-emblem">⚡</div>
+        <div class="hud-title-group">
+          <span class="hud-sys-label">[SYSTEM ARCHITECT: EXAM SLAYER]</span>
+          <h1 class="hud-main-title">SOLO LEVELING EXAM PREPARATION</h1>
+        </div>
+      </div>
+
+      <div class="hud-quick-stats">
+        <div class="hud-stat-pill">
+          <span class="hud-stat-label">LEVEL</span>
+          <span class="hud-stat-val text-cyan" id="hud-player-level">LVL 1</span>
+        </div>
+        <div class="hud-stat-pill">
+          <span class="hud-stat-label">RANK</span>
+          <span class="rank-badge rank-E" id="hud-player-rank">E-RANK</span>
+        </div>
+        <div class="hud-stat-pill">
+          <span class="hud-stat-label">GOLD</span>
+          <span class="hud-stat-val text-gold" id="hud-player-gold">150 G</span>
+        </div>
+      </div>
+
+      <div class="hud-actions">
+        <button id="hud-auth-btn" class="sys-btn sys-btn-primary" style="padding: 6px 12px; font-size: 0.75rem;">
+          ⚡ AWAKEN / LOGIN
+        </button>
+        <div id="hud-user-pill" style="display: none; align-items: center; gap: 8px;" class="hud-stat-pill">
+          <span style="color: #22c55e;">🟢</span>
+          <span id="hud-username-display" class="font-hud" style="font-size: 0.8rem; color: #fff;">Hunter</span>
+          <button id="hud-logout-btn" style="background: transparent; border: none; color: #ff3366; cursor: pointer; font-size: 0.75rem; margin-left: 4px;" title="Logout">LOGOUT</button>
+        </div>
+        <button class="hud-icon-btn active" id="hud-sound-toggle-btn" title="Toggle System Sound SFX" aria-label="Toggle Sound">
+          🔊
+        </button>
+      </div>
+    </header>
+
+    <!-- SYSTEM NAVIGATION TABS -->
+    <nav class="system-nav-tabs" aria-label="Main Navigation">
+      <div class="nav-tabs-group">
+        <button class="nav-tab-btn active" data-tab="tab-status">
+          <span class="nav-icon">👤</span> STATUS
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-vault">
+          <span class="nav-icon">📚</span> VAULT
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-quests">
+          <span class="nav-icon">📜</span> QUESTS <span class="tab-badge" id="nav-quest-badge">!</span>
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-dungeons">
+          <span class="nav-icon">⚔️</span> RAIDS & MOCKS
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-shadows">
+          <span class="nav-icon">👑</span> SHADOW ARMY
+        </button>
+      </div>
+
+      <div class="nav-divider"></div>
+
+      <div class="nav-tabs-group">
+        <button class="nav-tab-btn" data-tab="tab-leaderboard">
+          <span class="nav-icon">🏆</span> RANKINGS
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-focus">
+          <span class="nav-icon">⏳</span> FOCUS
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-shop">
+          <span class="nav-icon">💎</span> SHOP
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-syllabus">
+          <span class="nav-icon">🌐</span> SYLLABUS
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-admin" style="border-color: rgba(255, 215, 0, 0.4); color: var(--sys-gold);">
+          <span class="nav-icon">📊</span> GUILD HQ
+        </button>
+      </div>
+    </nav>
+
+    <!-- MAIN VIEWPORTS -->
+    <main class="system-viewports">
+
+      <!-- ====================================================================
+           TAB 1: PLAYER STATUS HUD
+           ==================================================================== -->
+      <section id="tab-status" class="viewport-tab-panel active">
+        <div class="grid-2col">
+          
+          <!-- Left: Hunter ID Card -->
+          <div class="player-status-card system-card hologram-corners">
+            <div class="hunter-header-row">
+              <div class="hunter-avatar-box">
+                🗡️
+                <div class="hunter-avatar-glow"></div>
+              </div>
+              <div class="hunter-info-col">
+                <span class="hunter-title-tag" id="status-player-title">The One Who Overcomes Formulas</span>
+                <input type="text" id="status-player-name" class="hunter-name-input" value="Sung Jin-Aspirant" title="Click to rename Hunter">
+                <div class="hunter-rank-row">
+                  <span id="status-player-rank" class="rank-badge rank-E">E-RANK HUNTER</span>
+                  <span class="hunter-level-badge">LEVEL <span id="status-player-lvl">1</span></span>
+                </div>
+
+                <!-- SSC CGL Target Post Selector -->
+                <div style="margin-top: 10px; background: rgba(0, 242, 255, 0.06); border: 1px solid var(--sys-border); border-radius: 4px; padding: 8px 10px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <span class="hud-sys-label text-gold">🎯 [SSC CGL DREAM POST]</span>
+                    <span id="target-post-cutoff" style="font-family: var(--font-hud); font-size: 0.75rem; color: var(--sys-gold);">Target: 335/390</span>
+                  </div>
+                  <select id="cgl-target-post-select" style="width: 100%; background: rgba(8, 14, 28, 0.9); border: 1px solid var(--sys-cyan); border-radius: 4px; padding: 6px 8px; color: #fff; font-family: var(--font-hud); font-size: 0.85rem; outline: none; cursor: pointer;">
+                    <!-- Rendered by JS -->
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Gauges (HP, MP, EXP) -->
+            <div class="resource-gauge-container">
+              <!-- HP -->
+              <div class="gauge-row">
+                <div class="gauge-label-row">
+                  <span class="text-red">HP (Focus Health)</span>
+                  <span id="status-hp-text" class="text-red">100 / 100</span>
+                </div>
+                <div class="gauge-track">
+                  <div id="status-hp-fill" class="gauge-fill hp" style="width: 100%;"></div>
+                </div>
+              </div>
+
+              <!-- MP -->
+              <div class="gauge-row">
+                <div class="gauge-label-row">
+                  <span class="text-cyan">MP (Mental Mana)</span>
+                  <span id="status-mp-text" class="text-cyan">50 / 50</span>
+                </div>
+                <div class="gauge-track">
+                  <div id="status-mp-fill" class="gauge-fill mp" style="width: 100%;"></div>
+                </div>
+              </div>
+
+              <!-- EXP -->
+              <div class="gauge-row">
+                <div class="gauge-label-row">
+                  <span class="text-shadow">EXP Progression</span>
+                  <span id="status-exp-text" class="text-shadow">0 / 100 (0%)</span>
+                </div>
+                <div class="gauge-track">
+                  <div id="status-exp-fill" class="gauge-fill exp" style="width: 0%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Lifetime Hunter Metrics -->
+            <div class="stats-table-box">
+              <div style="font-family: var(--font-hud); font-size: 0.85rem; color: var(--sys-cyan); border-bottom: 1px solid var(--sys-border); padding-bottom: 6px;">
+                HUNTER MILESTONES
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.85rem;">
+                <div>Questions Solved: <strong id="stat-total-solved" class="text-cyan">0</strong></div>
+                <div>Mocks Cleared: <strong id="stat-mocks-cleared" class="text-gold">0</strong></div>
+                <div>Shadows Extracted: <strong id="stat-shadows-count" class="text-shadow">0</strong></div>
+                <div>Study Streak: <strong id="stat-streak-count" class="text-cyan">1 Days</strong></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Attributes Allocation Table + Quick Question of the Day -->
+          <div style="display: flex; flex-direction: column; gap: 18px;">
+            
+            <div class="system-card hologram-corners" style="padding: 24px; display: flex; flex-direction: column; gap: 16px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--sys-border); padding-bottom: 12px;">
+                <h2 class="font-hud text-cyan" style="font-size: 1.1rem;">HUNTER ATTRIBUTES & STATS</h2>
+                <div class="unallocated-points-banner">
+                  <span>UNALLOCATED POINTS:</span>
+                  <strong id="status-unallocated-pts" style="margin-left: 6px; font-size: 1.1rem;">5</strong>
+                </div>
+              </div>
+
+              <!-- Stats List -->
+              <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div class="stat-item-row">
+                  <div class="stat-info-wrap">
+                    <div class="stat-title">🧠 INTELLIGENCE (INT)</div>
+                    <div class="stat-desc">Concept mastery, reasoning speed & max mental MP capacity</div>
+                  </div>
+                  <div class="stat-action-wrap">
+                    <span id="stat-val-int" class="stat-val-num">10</span>
+                    <button id="stat-btn-int" class="stat-plus-btn" title="Add point to Intelligence">+</button>
+                  </div>
+                </div>
+
+                <div class="stat-item-row">
+                  <div class="stat-info-wrap">
+                    <div class="stat-title">❤️ VITALITY (VIT)</div>
+                    <div class="stat-desc">Study endurance, focus length & max focus HP stamina</div>
+                  </div>
+                  <div class="stat-action-wrap">
+                    <span id="stat-val-vit" class="stat-val-num">10</span>
+                    <button id="stat-btn-vit" class="stat-plus-btn" title="Add point to Vitality">+</button>
+                  </div>
+                </div>
+
+                <div class="stat-item-row">
+                  <div class="stat-info-wrap">
+                    <div class="stat-title">⚡ AGILITY (AGI)</div>
+                    <div class="stat-desc">Problem solving speed and mock test rapid decision making</div>
+                  </div>
+                  <div class="stat-action-wrap">
+                    <span id="stat-val-agi" class="stat-val-num">10</span>
+                    <button id="stat-btn-agi" class="stat-plus-btn" title="Add point to Agility">+</button>
+                  </div>
+                </div>
+
+                <div class="stat-item-row">
+                  <div class="stat-info-wrap">
+                    <div class="stat-title">👁️ SENSE (SEN)</div>
+                    <div class="stat-desc">Accuracy rate, trick detection & negative marking defense</div>
+                  </div>
+                  <div class="stat-action-wrap">
+                    <span id="stat-val-sen" class="stat-val-num">10</span>
+                    <button id="stat-btn-sen" class="stat-plus-btn" title="Add point to Sense">+</button>
+                  </div>
+                </div>
+
+                <div class="stat-item-row">
+                  <div class="stat-info-wrap">
+                    <div class="stat-title">🛡️ DISCIPLINE / WILL (STR)</div>
+                    <div class="stat-desc">Habit consistency, daily streak power & bonus raid EXP multiplier</div>
+                  </div>
+                  <div class="stat-action-wrap">
+                    <span id="stat-val-str" class="stat-val-num">10</span>
+                    <button id="stat-btn-str" class="stat-plus-btn" title="Add point to Discipline">+</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Instant Daily Battle / Quick Practice Card -->
+            <div class="system-card hologram-corners" style="padding: 20px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <span class="hud-sys-label text-gold">⚔️ [INSTANT DAILY SKIRMISH]</span>
+                <span id="daily-skirmish-subject" class="stat-desc text-cyan">Quantitative Aptitude</span>
+              </div>
+              <div id="daily-skirmish-question" style="font-size: 0.95rem; color: #fff; line-height: 1.5; margin-bottom: 12px;">
+                Loading Instant Skirmish...
+              </div>
+              <div id="daily-skirmish-options" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <!-- Skirmish Options -->
+              </div>
+              <div id="daily-skirmish-feedback" style="margin-top: 10px; font-size: 0.85rem; display: none;"></div>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           TAB 2: QUESTION VAULT & CHAPTER PRACTICE
+           ==================================================================== -->
+      <section id="tab-vault" class="viewport-tab-panel">
+        <div class="system-card hologram-corners" style="padding: 24px; display: flex; flex-direction: column; gap: 20px;">
+          
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid var(--sys-border); padding-bottom: 12px;">
+            <div>
+              <span class="hud-sys-label">[HIGH-YIELD SSC KNOWLEDGE REPOSITORY]</span>
+              <h2 class="font-hud text-cyan" style="font-size: 1.3rem;">QUESTION ARCHIVE & CHAPTER PRACTICE</h2>
+              <div class="stat-desc">Browse, filter, and practice hundreds of official pattern questions with instant solution & trick reveals.</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <button id="vault-generate-inf-btn" class="sys-btn sys-btn-primary">
+                ⚡ GENERATE 50 FRESH PROCEDURAL QUESTIONS ♾️
+              </button>
+              <div class="hud-stat-pill">
+                <span class="hud-stat-label">TOTAL:</span>
+                <span id="vault-total-count" class="hud-stat-val text-cyan">0 Qs</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Search & Filter Controls -->
+          <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+            <input type="text" id="vault-search-input" placeholder="🔍 Search topic, keyword, formula..." style="flex: 1; min-width: 240px; background: rgba(8, 14, 28, 0.8); border: 1px solid var(--sys-border); border-radius: 4px; padding: 10px 14px; color: #fff; font-family: var(--font-body); font-size: 0.9rem; outline: none;">
+            
+            <select id="vault-subject-filter" style="background: rgba(8, 14, 28, 0.8); border: 1px solid var(--sys-border); border-radius: 4px; padding: 10px; color: var(--sys-cyan); font-family: var(--font-hud); font-size: 0.85rem; outline: none;">
+              <option value="all">ALL SUBJECTS</option>
+              <option value="Quantitative Aptitude">📐 Quantitative Aptitude</option>
+              <option value="General Intelligence & Reasoning">🧠 Logical Reasoning</option>
+              <option value="English Language">📖 English Language</option>
+              <option value="General Awareness">🌍 General Awareness</option>
+            </select>
+
+            <select id="vault-difficulty-filter" style="background: rgba(8, 14, 28, 0.8); border: 1px solid var(--sys-border); border-radius: 4px; padding: 10px; color: var(--sys-gold); font-family: var(--font-hud); font-size: 0.85rem; outline: none;">
+              <option value="all">ALL DIFFICULTIES</option>
+              <option value="Easy">🟢 Easy</option>
+              <option value="Medium">🟡 Medium</option>
+              <option value="Hard">🔴 Hard</option>
+            </select>
+          </div>
+
+          <!-- Questions List Container -->
+          <div id="vault-questions-container" style="display: flex; flex-direction: column; gap: 16px;">
+            <!-- Rendered by JS -->
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           TAB 3: DAILY QUESTS & PENALTY SYSTEM
+           ==================================================================== -->
+      <section id="tab-quests" class="viewport-tab-panel">
+        <div class="quest-panel-box system-card hologram-corners">
+          
+          <!-- Quest Header Banner -->
+          <div class="quest-header-banner">
+            <div>
+              <span class="hud-sys-label">[MANDATORY DAILY QUEST]</span>
+              <h2 class="quest-banner-title">PREPARATION TO CRACK THE EXAM</h2>
+            </div>
+            <div class="quest-timer-box">
+              <span>RESET COUNTDOWN:</span>
+              <span id="quest-reset-timer" class="quest-timer-val">23:59:59</span>
+            </div>
+          </div>
+
+          <!-- Overall Progress Gauge -->
+          <div class="gauge-row">
+            <div class="gauge-label-row">
+              <span class="text-cyan">Daily Routine Completion</span>
+              <span id="daily-quest-prog-text" class="text-cyan">0%</span>
+            </div>
+            <div class="gauge-track">
+              <div id="daily-quest-prog-fill" class="gauge-fill mp" style="width: 0%;"></div>
+            </div>
+          </div>
+
+          <!-- Tasks Checklist -->
+          <div class="quest-tasks-list" id="daily-tasks-list">
+            <!-- Rendered by JS -->
+          </div>
+
+          <!-- Rewards Strip -->
+          <div class="quest-reward-strip">
+            <div class="reward-items-row">
+              <span class="font-hud text-gold">QUEST REWARDS:</span>
+              <div class="reward-item-pill">✨ +250 EXP</div>
+              <div class="reward-item-pill">💎 +120 Gold</div>
+              <div class="reward-item-pill">⭐ +3 Stat Points</div>
+            </div>
+            <button id="claim-daily-reward-btn" class="sys-btn sys-btn-gold" disabled>
+              CLAIM REWARD BOX
+            </button>
+          </div>
+
+          <!-- Penalty Zone Banner -->
+          <div id="penalty-zone-banner" class="penalty-alert-box" style="display: none;">
+            <div class="penalty-title">
+              ⚠️ [ALERT: PENALTY QUEST - SURVIVAL IN THE DESERT]
+            </div>
+            <p style="font-size: 0.9rem; color: #fecdd3;">
+              You failed to complete your daily preparation on time! The System has initiated the Penalty Protocol. You must survive 5 rapid revision trials without making 3 mistakes to unlock normal privileges.
+            </p>
+            <button id="start-penalty-btn" class="sys-btn sys-btn-danger" style="align-self: flex-start;">
+              ENTER PENALTY DESERT 🌵
+            </button>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           TAB 4: GATE RAIDS & BOSS BATTLE CBT MOCKS
+           ==================================================================== -->
+      <section id="tab-dungeons" class="viewport-tab-panel">
+        
+        <!-- Selection View -->
+        <div id="dungeons-selection-view">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div>
+              <span class="hud-sys-label">[DUNGEON GATES & MOCK EXAMS]</span>
+              <h2 class="font-hud text-cyan" style="font-size: 1.3rem;">CHOOSE YOUR INSTANT GATE</h2>
+            </div>
+            <button id="toggle-cbt-view-btn" class="sys-btn sys-btn-primary">
+              SWITCH TO: OFFICIAL SSC CBT MODE
+            </button>
+          </div>
+
+          <div class="grid-dungeon-gates" id="dungeon-gates-grid">
+            <!-- Rendered by JS -->
+          </div>
+
+          <!-- Official Previous Years Question Papers (PYQ Mocks) -->
+          <div style="margin-top: 30px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
+              <div>
+                <span class="hud-sys-label text-gold">🏛️ [AUTHENTIC PREVIOUS YEARS EXAM PAPERS]</span>
+                <h3 class="font-hud text-cyan" style="font-size: 1.2rem;">OFFICIAL SSC PYQ CBT MOCKS</h3>
+              </div>
+              <span class="stat-desc">Real Exam Papers with Official Answer Keys & Step-by-Step Tricks</span>
+            </div>
+
+            <!-- PYQ Filter Buttons -->
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;" id="pyq-filter-buttons-bar">
+              <button class="sys-btn sys-btn-primary pyq-filter-btn active" data-filter="all">ALL PAPERS</button>
+              <button class="sys-btn pyq-filter-btn" data-filter="2025" style="border-color: var(--sys-gold); color: var(--sys-gold);">⭐ 2025 ALL PAPERS</button>
+              <button class="sys-btn pyq-filter-btn" data-filter="CGL">SSC CGL</button>
+              <button class="sys-btn pyq-filter-btn" data-filter="CHSL">SSC CHSL</button>
+              <button class="sys-btn pyq-filter-btn" data-filter="MTS">SSC MTS</button>
+              <button class="sys-btn pyq-filter-btn" data-filter="GD">SSC GD</button>
+              <button class="sys-btn pyq-filter-btn" data-filter="CPO">SSC CPO</button>
+            </div>
+
+            <div class="grid-dungeon-gates" id="pyq-papers-grid">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Active Raid / CBT Exam Arena View -->
+        <div id="dungeon-active-raid-view" style="display: none;">
+          <div class="boss-arena-wrapper">
+            
+            <!-- Boss HUD Header (Live Boss HP) -->
+            <div class="boss-hud-header" id="boss-hud-header">
+              <div class="boss-identity-row">
+                <div class="boss-name-group">
+                  <div class="boss-avatar" id="boss-display-avatar">👹</div>
+                  <div>
+                    <span class="hud-sys-label text-red">[DUNGEON BOSS]</span>
+                    <div class="boss-title" id="boss-display-name">Hobgoblin Leader</div>
+                  </div>
+                </div>
+                <div style="font-family: var(--font-hud); font-size: 1.3rem; color: var(--sys-gold);" id="cbt-timer-display">
+                  12:00
+                </div>
+              </div>
+
+              <!-- Boss HP Bar -->
+              <div class="boss-hp-container">
+                <div style="display: flex; justify-content: space-between; font-family: var(--font-hud); font-size: 0.75rem; color: #ff809b;">
+                  <span>BOSS HEALTH</span>
+                  <span id="boss-hp-text">1000 / 1000 HP</span>
+                </div>
+                <div class="boss-hp-bar-track">
+                  <div id="boss-hp-fill" class="boss-hp-bar-fill" style="width: 100%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- CBT Question and Palette Grid -->
+            <div class="cbt-exam-grid">
+              
+              <!-- Question Box -->
+              <div class="cbt-question-box system-card">
+                <div class="cbt-q-header">
+                  <div>
+                    <span id="cbt-question-number" class="cbt-q-num">QUESTION 1 OF 10</span>
+                    <div id="cbt-question-subject" class="cbt-q-marks">Quantitative Aptitude • Profit & Loss (Medium)</div>
+                  </div>
+                  <span class="text-gold font-hud">+2.0 / -0.50</span>
+                </div>
+
+                <div class="cbt-q-text" id="cbt-question-text">
+                  Loading question...
+                </div>
+
+                <div class="cbt-options-list" id="cbt-options-container">
+                  <!-- Options rendered by JS -->
+                </div>
+
+                <div class="cbt-q-actions">
+                  <div style="display: flex; gap: 8px;">
+                    <button class="sys-btn" id="cbt-prev-btn">PREV</button>
+                    <button class="sys-btn" id="cbt-next-btn">NEXT</button>
+                    <button class="sys-btn" id="cbt-clear-btn">CLEAR</button>
+                    <button class="sys-btn" id="cbt-flag-btn">MARK FOR REVIEW</button>
+                  </div>
+                  <button class="sys-btn sys-btn-primary" id="cbt-submit-test-btn">
+                    SUBMIT RAID / TEST ⚔️
+                  </button>
+                </div>
+              </div>
+
+              <!-- Right Question Palette -->
+              <div class="cbt-palette-card system-card">
+                <div class="palette-title">QUESTION PALETTE</div>
+                <div class="palette-grid" id="cbt-palette-grid">
+                  <!-- Palette buttons rendered by JS -->
+                </div>
+                <div style="font-size: 0.75rem; color: var(--sys-text-dim); display: flex; flex-direction: column; gap: 4px; margin-top: 10px;">
+                  <div>🟢 Green: Answered</div>
+                  <div>🟡 Yellow: Marked for Review</div>
+                  <div>⚪ Slate: Unanswered</div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Post-Test Scoreboard & Solutions View -->
+        <div id="dungeon-scoreboard-view" style="display: none;">
+          <div class="system-card hologram-corners" style="padding: 24px; display: flex; flex-direction: column; gap: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--sys-border); padding-bottom: 12px;">
+              <h2 id="score-boss-result-title" class="font-hud text-cyan" style="font-size: 1.3rem;">
+                ⚔️ DUNGEON CLEARED - BOSS DEFEATED!
+              </h2>
+              <button id="scoreboard-back-btn" class="sys-btn sys-btn-primary">
+                RETURN TO GATES
+              </button>
+            </div>
+
+            <!-- Score Summary Cards -->
+            <div class="grid-3col">
+              <div class="system-card" style="padding: 16px; text-align: center;">
+                <div class="stat-desc">FINAL SCORE</div>
+                <div id="score-raw-marks" class="font-hud text-cyan" style="font-size: 1.8rem;">18.00 / 20</div>
+              </div>
+              <div class="system-card" style="padding: 16px; text-align: center;">
+                <div class="stat-desc">ACCURACY RATE</div>
+                <div id="score-accuracy-pct" class="font-hud text-gold" style="font-size: 1.8rem;">90%</div>
+              </div>
+              <div class="system-card" style="padding: 16px; text-align: center;">
+                <div class="stat-desc">ATTEMPT BREAKDOWN</div>
+                <div style="font-family: var(--font-hud); font-size: 0.95rem; margin-top: 6px;">
+                  <span class="text-cyan">✓ <span id="score-correct-count">9</span></span> | 
+                  <span class="text-red">✗ <span id="score-wrong-count">1</span></span> | 
+                  <span class="text-dim">⚪ <span id="score-unattempted-count">0</span></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Detailed Solutions List -->
+            <div>
+              <h3 class="font-hud text-cyan" style="font-size: 1.1rem; margin-bottom: 12px;">
+                DETAILED SOLUTIONS & HUNTER SHORTCUTS
+              </h3>
+              <div id="score-solutions-breakdown" style="display: flex; flex-direction: column; gap: 12px;">
+                <!-- Solution items rendered by JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ====================================================================
+           TAB 5: SHADOW ARMY & "ARISE" (MISTAKE NOTEBOOK)
+           ==================================================================== -->
+      <section id="tab-shadows" class="viewport-tab-panel">
+        <div class="shadow-monarch-chamber hologram-corners">
+          
+          <div class="monarch-header-banner">
+            <div class="monarch-title-group">
+              <div class="monarch-rune-icon">👑</div>
+              <div>
+                <span class="hud-sys-label" style="color: #c084fc;">[DOMAIN OF THE MONARCH]</span>
+                <h2 class="monarch-h1">SHADOW ARMY & "ARISE" EXTRACTION</h2>
+                <div class="monarch-sub">Transform failed questions into eternal loyal Shadow Soldiers.</div>
+              </div>
+            </div>
+            <div class="hud-stat-pill" style="border-color: #a855f7;">
+              <span class="hud-stat-label" style="color: #d8b4fe;">TOTAL SHADOWS:</span>
+              <span id="monarch-total-shadows" class="hud-stat-val text-shadow" style="font-size: 1.2rem;">0</span>
+            </div>
+          </div>
+
+          <!-- 4 Shadow Lieutenants -->
+          <div>
+            <h3 class="font-hud text-shadow" style="font-size: 1.05rem; margin-bottom: 12px;">
+              SHADOW COMMANDERS & ACTIVE PASSIVE BUFFS
+            </h3>
+            <div class="shadow-commanders-row" id="shadow-commanders-grid">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+
+          <!-- Fallen Monsters Mistake Queue -->
+          <div class="fallen-monsters-section">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <h3 class="font-hud" style="color: #f3e8ff; font-size: 1.05rem;">
+                FALLEN MONSTERS CHASM (MISTAKES NOTEBOOK)
+              </h3>
+            </div>
+            
+            <div id="fallen-monsters-list" style="display: flex; flex-direction: column; gap: 12px;">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           TAB 6: FOCUS DUNGEON (POMODORO)
+           ==================================================================== -->
+      <section id="tab-focus" class="viewport-tab-panel">
+        <div class="focus-dungeon-box system-card hologram-corners">
+          <div>
+            <span class="hud-sys-label">[HYPERBOLIC TIME CHAMBER]</span>
+            <h2 class="font-hud text-cyan" style="font-size: 1.6rem;">FOCUS STUDY DUNGEON</h2>
+            <p class="stat-desc">Enter deep study focus. Ambient binaural alpha beats synchronize brainwaves for maximum retention.</p>
+          </div>
+
+          <!-- Timer Clock Display -->
+          <div class="focus-timer-display" id="focus-timer-text">
+            25:00
+          </div>
+
+          <!-- Preset Buttons -->
+          <div style="display: flex; gap: 10px;">
+            <button class="sys-btn focus-preset-btn" data-mins="25">25 MINS (QUICK DRILL)</button>
+            <button class="sys-btn focus-preset-btn" data-mins="45">45 MINS (STANDARD RAID)</button>
+            <button class="sys-btn focus-preset-btn" data-mins="60">60 MINS (DEEP CONQUER)</button>
+          </div>
+
+          <!-- Action Controls -->
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <button id="focus-start-btn" class="sys-btn sys-btn-primary" style="padding: 12px 30px; font-size: 1rem;">
+              START FOCUS DUNGEON ⚔️
+            </button>
+            <button id="focus-reset-btn" class="sys-btn">
+              RESET
+            </button>
+          </div>
+
+          <!-- Ambient Audio Switcher -->
+          <div class="ambient-sound-controls">
+            <span>🎧 SOUNDSCAPE:</span>
+            <button id="focus-ambient-toggle-btn" class="sys-btn" style="padding: 6px 14px; font-size: 0.75rem;">
+              ALPHA BINAURAL BEAT (OFF 🔇)
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           TAB 7: SYSTEM SHOP & INVENTORY
+           ==================================================================== -->
+      <section id="tab-shop" class="viewport-tab-panel">
+        <div class="system-card hologram-corners" style="padding: 24px; display: flex; flex-direction: column; gap: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--sys-border); padding-bottom: 12px;">
+            <div>
+              <span class="hud-sys-label">[SYSTEM SHOP & INVENTORY]</span>
+              <h2 class="font-hud text-cyan" style="font-size: 1.3rem;">MYSTIC HUNTER STORE</h2>
+            </div>
+            <div class="hud-stat-pill">
+              <span class="hud-stat-label">AVAILABLE GOLD:</span>
+              <span id="shop-gold-display" class="hud-stat-val text-gold">150 G</span>
+            </div>
+          </div>
+
+          <div class="shop-grid" id="system-shop-grid">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           TAB 8: LATEST SYLLABUS & ONLINE GATEWAYS
+           ==================================================================== -->
+      <section id="tab-syllabus" class="viewport-tab-panel">
+        <div class="system-card hologram-corners" style="padding: 24px; display: flex; flex-direction: column; gap: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid var(--sys-border); padding-bottom: 12px;">
+            <div>
+              <span class="hud-sys-label">[OFFICIAL PATTERN & LIVE GATEWAY]</span>
+              <h2 class="font-hud text-cyan" style="font-size: 1.3rem;">SSC EXAM SYLLABUS & ONLINE SYNC</h2>
+              <div id="syllabus-version-tag" class="stat-desc text-gold">2025-2026 Revised Pattern</div>
+            </div>
+            <button id="sync-online-questions-btn" class="sys-btn sys-btn-primary">
+              SYNC LIVE ONLINE QUESTIONS 🌐
+            </button>
+          </div>
+
+          <!-- Syllabus Sections Grid -->
+          <div style="display: flex; flex-direction: column; gap: 12px;" id="syllabus-sections-list">
+            <!-- Rendered by JS -->
+          </div>
+
+          <!-- Custom JSON Importer -->
+          <div class="system-card" style="padding: 18px; border-color: rgba(56, 189, 248, 0.2); background: rgba(5, 8, 17, 0.8);">
+            <h3 class="font-hud text-cyan" style="font-size: 0.95rem; margin-bottom: 8px;">
+              📥 IMPORT CUSTOM QUESTIONS / SYLLABUS (JSON)
+            </h3>
+            <p class="stat-desc" style="margin-bottom: 10px;">
+              Paste custom question arrays in JSON format to instantly expand your System database with new topics, mock tests, or custom notes.
+            </p>
+            <textarea id="import-json-textarea" placeholder='[ { "id": "custom_1", "subject": "Quantitative Aptitude", "topic": "Percentages", "question": "...", "options": ["A", "B", "C", "D"], "correct": 0, "explanation": "..." } ]' style="width: 100%; height: 90px; background: rgba(10, 16, 32, 0.9); border: 1px solid var(--sys-border); border-radius: 4px; color: #fff; padding: 8px; font-family: monospace; font-size: 0.8rem; outline: none; margin-bottom: 10px;"></textarea>
+            <button id="import-json-btn" class="sys-btn sys-btn-gold">
+              IMPORT QUESTIONS INTO SYSTEM 💾
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           TAB: GLOBAL HUNTER LEADERBOARD & RANKINGS HALL
+           ==================================================================== -->
+      <section id="tab-leaderboard" class="viewport-tab-panel">
+        <div class="system-card hologram-corners" style="padding: 24px; display: flex; flex-direction: column; gap: 22px;">
+          
+          <!-- Header -->
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid var(--sys-border); padding-bottom: 14px;">
+            <div>
+              <span class="hud-sys-label text-gold">🏆 [NATIONAL HUNTER RANKINGS HALL]</span>
+              <h2 class="font-hud text-cyan" style="font-size: 1.4rem;">ALL-INDIA SSC CGL HUNTER LEADERBOARD</h2>
+              <div class="stat-desc">Top aspirants ranked across National Mock Tests, Level progression, Accuracy, and Daily Discipline.</div>
+            </div>
+            <button id="refresh-leaderboard-btn" class="sys-btn sys-btn-primary">
+              REFRESH RANKINGS 🔄
+            </button>
+          </div>
+
+          <!-- My Current Rank Sticky Banner -->
+          <div id="my-rank-banner" class="my-rank-banner">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="font-size: 1.8rem;">⚡</div>
+              <div>
+                <div class="font-hud text-cyan" style="font-size: 0.95rem;">YOUR NATIONAL STANDING</div>
+                <div style="font-size: 0.85rem; color: #fff;">Rank Position: <strong id="my-rank-pos" class="text-gold">#1</strong> • Level: <strong id="my-rank-lvl" class="text-cyan">LVL 1</strong> • Tier: <span id="my-rank-tier" class="rank-badge rank-E">E-RANK</span></div>
+              </div>
+            </div>
+            <div style="font-size: 0.85rem; color: #e2e8f0;" id="my-rank-subtext">
+              Target Post: <strong class="text-gold" id="my-rank-post">Income Tax Inspector</strong>
+            </div>
+          </div>
+
+          <!-- Top 3 Champions Podium -->
+          <div id="leaderboard-podium-container" class="podium-container">
+            <!-- Rendered by JS -->
+          </div>
+
+          <!-- Filter Pills Bar -->
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;" id="leaderboard-filter-bar">
+            <button class="sys-btn sys-btn-primary lb-filter-btn active" data-filter="all">⭐ ALL HUNTERS</button>
+            <button class="sys-btn lb-filter-btn" data-filter="s_rank" style="border-color: #ffd700; color: #ffd700;">👑 S-RANK & MONARCHS</button>
+            <button class="sys-btn lb-filter-btn" data-filter="iti">💰 INCOME TAX ASPIRANTS</button>
+            <button class="sys-btn lb-filter-btn" data-filter="aso_mea">🌐 ASO IN MEA</button>
+            <button class="sys-btn lb-filter-btn" data-filter="streaks">🔥 STREAK LEADERS</button>
+          </div>
+
+          <!-- Detailed Rankings Table -->
+          <div class="leaderboard-table-container">
+            <table class="leaderboard-table">
+              <thead>
+                <tr>
+                  <th>RANK</th>
+                  <th>HUNTER ALIAS</th>
+                  <th>LEVEL</th>
+                  <th>TIER</th>
+                  <th>DREAM CGL POST</th>
+                  <th>QUESTIONS SOLVED</th>
+                  <th>MOCKS CLEARED</th>
+                  <th>STREAK</th>
+                </tr>
+              </thead>
+              <tbody id="leaderboard-table-body">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           TAB: GUILD MASTER HQ & STUDENT ANALYTICS DASHBOARD
+           ==================================================================== -->
+      <section id="tab-admin" class="viewport-tab-panel">
+        
+        <!-- 1. Security Lock Screen (Visible to anyone without Master PIN) -->
+        <div id="admin-lock-screen" class="system-card hologram-corners" style="max-width: 480px; margin: 40px auto; padding: 36px 24px; text-align: center; display: flex; flex-direction: column; gap: 18px;">
+          <div style="font-size: 3rem;">🔒</div>
+          <div>
+            <span class="hud-sys-label text-gold">👑 [RESTRICTED GUILD MASTER ACCESS]</span>
+            <h2 class="font-hud text-cyan" style="font-size: 1.3rem; margin-top: 4px;">GUILD HEADQUARTERS IS LOCKED</h2>
+            <div class="stat-desc" style="margin-top: 6px;">This command center is restricted strictly to the System Owner. Students cannot access this section without the Master Security Key.</div>
+          </div>
+          
+          <form id="admin-pin-form" style="display: flex; flex-direction: column; gap: 12px; margin-top: 8px;">
+            <input type="password" id="admin-pin-input" class="auth-input-field" placeholder="Enter Master Security PIN..." required style="text-align: center; letter-spacing: 3px; font-size: 1.1rem;">
+            <div id="admin-pin-error" style="color: #ff3366; font-size: 0.8rem; display: none;">✗ Invalid Security PIN! Access denied.</div>
+            <button type="submit" class="sys-btn sys-btn-primary" style="padding: 12px;">
+              AUTHENTICATE AS GUILD MASTER ⚡
+            </button>
+          </form>
+        </div>
+
+        <!-- 2. Authorized Dashboard Container (Hidden until PIN is authenticated) -->
+        <div id="admin-unlocked-dashboard" class="system-card hologram-corners" style="padding: 24px; display: none; flex-direction: column; gap: 24px;">
+          
+          <!-- Top Header -->
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid var(--sys-border); padding-bottom: 14px;">
+            <div>
+              <span class="hud-sys-label text-gold">👑 [GUILD MASTER COMMAND CENTER - UNLOCKED]</span>
+              <h2 class="font-hud text-cyan" style="font-size: 1.4rem;">ASPIRANT ARMY ANALYTICS & ROSTER</h2>
+              <div class="stat-desc">Real-time surveillance of student progress across distributed mobile APKs.</div>
+            </div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <button id="admin-refresh-btn" class="sys-btn sys-btn-primary">
+                REFRESH DATA 🔄
+              </button>
+              <button id="admin-export-csv-btn" class="sys-btn" style="background: rgba(255, 215, 0, 0.15); border-color: var(--sys-gold); color: var(--sys-gold);">
+                📥 EXPORT EXCEL (CSV)
+              </button>
+              <button id="admin-lock-btn" class="sys-btn" style="border-color: #ff3366; color: #ff3366;">
+                LOCK HQ 🔒
+              </button>
+            </div>
+          </div>
+
+          <!-- KPI Summary Cards -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px;">
+            <div class="system-card" style="padding: 16px; border-color: var(--sys-cyan); background: rgba(0, 242, 255, 0.05);">
+              <span class="hud-sys-label text-cyan">TOTAL REGISTERED ASPIRANTS</span>
+              <div class="font-hud" style="font-size: 2rem; color: #fff; margin-top: 4px;" id="admin-kpi-aspirants">0</div>
+              <div class="stat-desc">Active users across APKs</div>
+            </div>
+            <div class="system-card" style="padding: 16px; border-color: var(--sys-gold); background: rgba(255, 215, 0, 0.05);">
+              <span class="hud-sys-label text-gold">TOTAL QUESTIONS SOLVED</span>
+              <div class="font-hud" style="font-size: 2rem; color: var(--sys-gold); margin-top: 4px;" id="admin-kpi-solved">0 Qs</div>
+              <div class="stat-desc">Combined army practice volume</div>
+            </div>
+            <div class="system-card" style="padding: 16px; border-color: var(--sys-shadow); background: rgba(168, 85, 247, 0.05);">
+              <span class="hud-sys-label text-shadow">MOCK TESTS ATTEMPTED</span>
+              <div class="font-hud" style="font-size: 2rem; color: #d8b4fe; margin-top: 4px;" id="admin-kpi-mocks">0 Raids</div>
+              <div class="stat-desc">Full CBT mocks completed</div>
+            </div>
+            <div class="system-card" style="padding: 16px; border-color: #22c55e; background: rgba(34, 197, 94, 0.05);">
+              <span class="hud-sys-label" style="color: #4ade80;">AVERAGE HUNTER LEVEL</span>
+              <div class="font-hud" style="font-size: 2rem; color: #4ade80; margin-top: 4px;" id="admin-kpi-avg-lvl">LVL 1</div>
+              <div class="stat-desc">Overall army mastery power</div>
+            </div>
+          </div>
+
+          <!-- Filter & Search Bar -->
+          <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+            <input type="text" id="admin-search-input" placeholder="🔍 Search student name, username, or post..." style="flex: 1; min-width: 240px; background: rgba(8, 14, 28, 0.8); border: 1px solid var(--sys-border); border-radius: 4px; padding: 10px 14px; color: #fff; font-family: var(--font-body); font-size: 0.9rem; outline: none;">
+            <select id="admin-target-filter" style="background: rgba(8, 14, 28, 0.8); border: 1px solid var(--sys-border); border-radius: 4px; padding: 10px; color: var(--sys-cyan); font-family: var(--font-hud); font-size: 0.85rem; outline: none;">
+              <option value="all">ALL DREAM POSTS</option>
+              <option value="iti">💰 Income Tax Inspector</option>
+              <option value="aso_mea">🌐 ASO in MEA</option>
+              <option value="gst_inspector">⚡ GST Inspector</option>
+              <option value="cbi_si">🔍 CBI Sub-Inspector</option>
+              <option value="ed_aeo">⚖️ ED Assistant Enforcement Officer</option>
+              <option value="cag_aao">👑 Assistant Audit Officer (AAO)</option>
+            </select>
+          </div>
+
+          <!-- Aspirants Table -->
+          <div class="leaderboard-table-container">
+            <table class="leaderboard-table">
+              <thead>
+                <tr>
+                  <th>HUNTER</th>
+                  <th>LEVEL</th>
+                  <th>RANK</th>
+                  <th>TARGET CGL POST</th>
+                  <th>QUESTIONS SOLVED</th>
+                  <th>MOCKS CLEARED</th>
+                  <th>STREAK</th>
+                  <th>INSPECT</th>
+                </tr>
+              </thead>
+              <tbody id="admin-aspirants-table-body">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- ====================================================================
+       SYSTEM MODALS & POPUPS
+       ==================================================================== -->
+
+  <!-- 1. General System Alert Modal -->
+  <div id="system-alert-modal" class="system-modal-overlay">
+    <div class="system-modal-window">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span>⚡</span> <span id="sys-modal-title">SYSTEM NOTIFICATION</span>
+        </div>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <p id="sys-modal-message" style="font-size: 1rem; color: #fff; line-height: 1.6; margin: 16px 0;">
+        Message text goes here...
+      </p>
+      <div style="display: flex; justify-content: flex-end;">
+        <button class="sys-btn sys-btn-primary modal-close-btn">CONFIRM</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. "ARISE" Extraction VFX Modal -->
+  <div id="arise-fx-modal" class="system-modal-overlay">
+    <div class="system-modal-window" style="background: radial-gradient(circle, #240046, #050811); border-color: #a855f7; box-shadow: var(--glow-shadow-aura); text-align: center; padding: 40px 20px;">
+      <div style="font-size: 3.5rem; color: #c084fc; margin-bottom: 10px; animation: ariseExtraction 1.5s ease;">
+        👑
+      </div>
+      <h2 class="font-monarch text-shadow" style="font-size: 2.2rem; letter-spacing: 4px; margin-bottom: 8px;">
+        " A R I S E "
+      </h2>
+      <p style="font-family: var(--font-hud); font-size: 1.1rem; color: #f3e8ff;">
+        CONCEPT EXTRACTED INTO SHADOW ARMY!
+      </p>
+      <div style="margin-top: 14px; font-size: 0.9rem; color: #d8b4fe;">
+        Assigned to: <strong id="arise-commander-name">Shadow Igris</strong> (+80 EXP)
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Penalty Desert Survival Modal -->
+  <div id="penalty-zone-modal" class="system-modal-overlay">
+    <div class="system-modal-window" style="border-color: var(--sys-red); box-shadow: var(--glow-red);">
+      <div class="modal-header">
+        <div class="modal-title" style="color: var(--sys-red);">
+          <span>🌵</span> [PENALTY QUEST: SURVIVAL IN THE DESERT]
+        </div>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <p id="penalty-q-text" style="font-size: 1.05rem; color: #fff; margin-bottom: 16px;">
+        Trial loading...
+      </p>
+      <div id="penalty-q-options" style="display: flex; flex-direction: column; gap: 8px;">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Hunter Awakening / Authentication Modal -->
+  <div id="auth-modal" class="system-modal-overlay">
+    <div class="system-modal-window" style="max-width: 440px;">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span>⚡</span> <span id="auth-modal-title">HUNTER AWAKENING</span>
+        </div>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+
+      <div class="auth-tabs-header">
+        <button type="button" class="auth-tab-toggle active" id="auth-tab-login-btn">LOGIN</button>
+        <button type="button" class="auth-tab-toggle" id="auth-tab-register-btn">AWAKEN (SIGN UP)</button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="auth-login-form">
+        <div class="auth-form-group">
+          <label class="auth-input-label">USERNAME</label>
+          <input type="text" id="login-username" class="auth-input-field" placeholder="Enter hunter username..." required>
+        </div>
+        <div class="auth-form-group">
+          <label class="auth-input-label">PASSWORD</label>
+          <input type="password" id="login-password" class="auth-input-field" placeholder="Enter password..." required>
+        </div>
+        <div id="login-error-msg" style="color: #ff3366; font-size: 0.8rem; margin-bottom: 12px; display: none;"></div>
+        <button type="submit" class="sys-btn sys-btn-primary" style="width: 100%; padding: 12px;">
+          ENTER SYSTEM (LOGIN) ⚡
+        </button>
+      </form>
+
+      <!-- Register Form -->
+      <form id="auth-register-form" style="display: none;">
+        <div class="auth-form-group">
+          <label class="auth-input-label">HUNTER ALIAS (DISPLAY NAME)</label>
+          <input type="text" id="reg-hunter-name" class="auth-input-field" placeholder="e.g. Sung Jin-Aspirant" required>
+        </div>
+        <div class="auth-form-group">
+          <label class="auth-input-label">USERNAME (LOGIN ID)</label>
+          <input type="text" id="reg-username" class="auth-input-field" placeholder="Choose unique username..." required>
+        </div>
+        <div class="auth-form-group">
+          <label class="auth-input-label">PASSWORD</label>
+          <input type="password" id="reg-password" class="auth-input-field" placeholder="Choose secure password..." required>
+        </div>
+        <div id="reg-error-msg" style="color: #ff3366; font-size: 0.8rem; margin-bottom: 12px; display: none;"></div>
+        <button type="submit" class="sys-btn sys-btn-shadow" style="width: 100%; padding: 12px;">
+          AWAKEN AS A PLAYER (SIGN UP) 👑
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- JavaScript Scripts -->
+  <script src="js/audio-engine.js"></script>
+  <script src="js/player-system.js"></script>
+  <script src="js/infinite-generator.js"></script>
+  <script src="js/pyq-papers.js"></script>
+  <script src="js/question-bank.js"></script>
+  <script src="js/online-sync.js"></script>
+  <script src="js/quests-engine.js"></script>
+  <script src="js/shadows-engine.js"></script>
+  <script src="js/dungeons-engine.js"></script>
+  <script src="js/shop-engine.js"></script>
+  <script src="js/auth-client.js"></script>
+  <script src="js/admin-portal.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,263 @@
+/* ==========================================================================
+   SOLO LEVELING EXAM PREPARATION SYSTEM - LAYOUT
+   ========================================================================== */
+
+/* Main Container */
+.system-app-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 16px 20px 60px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-height: 100vh;
+}
+
+/* System Top Bar (Header HUD) */
+.system-top-hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: rgba(10, 16, 32, 0.85);
+  border: 1px solid var(--sys-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  position: sticky;
+  top: 10px;
+  z-index: 100;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.hud-branding {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.system-emblem {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  background: radial-gradient(circle, rgba(0, 242, 255, 0.3) 0%, rgba(0, 85, 255, 0.1) 100%);
+  border: 1.5px solid var(--sys-cyan);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  box-shadow: var(--glow-cyan-sm);
+  animation: neonPulse 3s infinite ease-in-out;
+}
+
+.hud-title-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.hud-sys-label {
+  font-family: var(--font-hud);
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  color: var(--sys-cyan);
+  text-transform: uppercase;
+}
+
+.hud-main-title {
+  font-family: var(--font-hud);
+  font-size: 1.25rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(0, 242, 255, 0.4);
+}
+
+/* HUD Quick Stats Bar */
+.hud-quick-stats {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.hud-stat-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(13, 22, 43, 0.7);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+
+.hud-stat-label {
+  font-family: var(--font-hud);
+  font-size: 0.75rem;
+  color: var(--sys-text-dim);
+}
+
+.hud-stat-val {
+  font-family: var(--font-hud);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+/* Audio & Settings Controls in Header */
+.hud-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hud-icon-btn {
+  background: rgba(13, 22, 43, 0.6);
+  border: 1px solid var(--sys-border);
+  color: var(--sys-text-white);
+  width: 38px;
+  height: 38px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: all var(--transition-fast);
+}
+
+.hud-icon-btn:hover {
+  border-color: var(--sys-cyan);
+  color: var(--sys-cyan);
+  box-shadow: var(--glow-cyan-sm);
+}
+
+.hud-icon-btn.active {
+  background: rgba(0, 242, 255, 0.2);
+  border-color: var(--sys-cyan);
+  color: var(--sys-cyan);
+}
+
+/* Navigation Tabs */
+.system-nav-tabs {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: rgba(10, 16, 32, 0.85);
+  border: 1px solid var(--sys-border);
+  border-radius: 10px;
+  padding: 6px 10px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  overflow-x: auto;
+}
+
+.nav-tabs-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nav-divider {
+  width: 1px;
+  height: 24px;
+  background: rgba(56, 189, 248, 0.2);
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+
+.nav-tab-btn {
+  padding: 8px 14px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--sys-text-dim);
+  font-family: var(--font-hud);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  position: relative;
+}
+
+.nav-tab-btn:hover {
+  color: var(--sys-cyan);
+  background: rgba(0, 242, 255, 0.08);
+  border-color: rgba(56, 189, 248, 0.2);
+}
+
+.nav-tab-btn.active {
+  background: linear-gradient(135deg, rgba(0, 153, 255, 0.25), rgba(0, 242, 255, 0.15));
+  border-color: var(--sys-cyan);
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(0, 242, 255, 0.25);
+  text-shadow: 0 0 8px rgba(0, 242, 255, 0.6);
+}
+
+.nav-tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 20%;
+  width: 60%;
+  height: 2px;
+  background: var(--sys-cyan);
+  box-shadow: 0 0 8px var(--sys-cyan);
+  border-radius: 2px;
+}
+
+.nav-icon {
+  font-size: 0.95rem;
+}
+
+.nav-tab-btn .tab-badge {
+  background: var(--sys-red);
+  color: #fff;
+  font-size: 0.65rem;
+  padding: 1px 5px;
+  border-radius: 10px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+/* Main Viewport Content */
+.system-viewports {
+  min-height: 550px;
+}
+
+.viewport-tab-panel {
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+
+.viewport-tab-panel.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 2-Column and 3-Column Grids */
+.grid-2col {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 20px;
+}
+
+.grid-3col {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.grid-dungeon-gates {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 18px;
+}

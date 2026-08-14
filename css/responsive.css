@@ -1,0 +1,82 @@
+/* ==========================================================================
+   SOLO LEVELING EXAM PREPARATION SYSTEM - RESPONSIVENESS
+   ========================================================================== */
+
+@media (max-width: 1024px) {
+  .grid-2col {
+    grid-template-columns: 1fr;
+  }
+  
+  .cbt-exam-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .system-top-hud {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  
+  .hud-actions {
+    align-self: flex-end;
+  }
+}
+
+@media (max-width: 768px) {
+  .system-app-container {
+    padding: 10px 10px 50px 10px;
+    gap: 14px;
+  }
+  
+  .hud-quick-stats {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .hud-stat-pill {
+    padding: 4px 10px;
+  }
+  
+  .system-nav-tabs {
+    flex-direction: row;
+    overflow-x: auto;
+    padding: 6px 8px;
+    gap: 8px;
+    justify-content: flex-start;
+  }
+  
+  .nav-tabs-group {
+    flex-shrink: 0;
+  }
+  
+  .nav-tab-btn {
+    padding: 6px 10px;
+    font-size: 0.72rem;
+  }
+  
+  .focus-timer-display {
+    font-size: 3.2rem;
+  }
+  
+  .hunter-header-row {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
+  
+  .reward-items-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .quest-reward-strip {
+    flex-direction: column;
+    gap: 14px;
+    align-items: stretch;
+  }
+  
+  .system-modal-window {
+    padding: 16px;
+  }
+}
