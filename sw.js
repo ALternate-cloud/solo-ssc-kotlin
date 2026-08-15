@@ -1,5 +1,5 @@
 // Service Worker for Solo Leveling SSC CGL PWA / Web APK
-const CACHE_NAME = 'solo-leveling-ssc-v5';
+const CACHE_NAME = 'solo-leveling-ssc-v6';
 const OFFLINE_URL = '/offline.html';
 
 const ASSETS_TO_CACHE = [
@@ -37,15 +37,15 @@ const ASSETS_TO_CACHE = [
   '/js/app.js'
 ];
 
-// Install: Cache core assets safely without breaking if one fails
+// Install: Cache critical assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(async (cache) => {
       for (const url of ASSETS_TO_CACHE) {
         try {
           await cache.add(url);
-        } catch (err) {
-          console.warn(`[SW] Cache skipped for: ${url}`, err);
+        } catch (e) {
+          // ignore non-critical asset cache errors
         }
       }
     })
@@ -53,7 +53,7 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
-// Activate: Purge old cache versions immediately
+// Activate: Clean up any old caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -69,49 +69,63 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch: Safe Network-First for Navigation, Stale-While-Revalidate for Assets
+// Fetch: Always return valid Response, never throw or resolve null
 self.addEventListener('fetch', (event) => {
-  // Always let API calls go directly to the server
+  // Pass API requests directly to network
   if (event.request.url.includes('/api/')) {
     return;
   }
 
-  // Navigation requests: Network -> Cache -> Offline Fallback
+  // Only handle GET requests
+  if (event.request.method !== 'GET') {
+    return;
+  }
+
+  // Navigation requests (HTML page load)
   if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request)
-        .then((response) => {
-          if (response && response.status === 200) {
-            const responseClone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const clone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
           }
-          return response;
+          return networkResponse;
         })
         .catch(async () => {
           const cached = await caches.match(event.request);
           if (cached) return cached;
           const indexCached = await caches.match('/index.html');
           if (indexCached) return indexCached;
-          return caches.match(OFFLINE_URL);
+          const offlineCached = await caches.match(OFFLINE_URL);
+          if (offlineCached) return offlineCached;
+          return new Response('<!DOCTYPE html><html><body><h2>Solo SSC Offline</h2><p>Reconnecting to System...</p></body></html>', {
+            headers: { 'Content-Type': 'text/html; charset=utf-8' }
+          });
         })
     );
     return;
   }
 
-  // Static Assets: Stale-While-Revalidate with Safe Fallback
+  // Static Assets (CSS, JS, Images): Cache First with background refresh
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      const fetchPromise = fetch(event.request)
-        .then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200 && event.request.method === 'GET') {
-            const responseClone = networkResponse.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
-          }
-          return networkResponse;
-        })
-        .catch(() => null);
+      if (cachedResponse) {
+        fetch(event.request)
+          .then((networkResponse) => {
+            if (networkResponse && networkResponse.status === 200) {
+              caches.open(CACHE_NAME).then((cache) => cache.put(event.request, networkResponse));
+            }
+          })
+          .catch(() => {});
+        return cachedResponse;
+      }
 
-      return cachedResponse || fetchPromise || caches.match(OFFLINE_URL);
+      return fetch(event.request).catch(async () => {
+        const offline = await caches.match(OFFLINE_URL);
+        if (offline) return offline;
+        return new Response('', { status: 404, statusText: 'Not Found' });
+      });
     })
   );
 });
