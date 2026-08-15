@@ -335,6 +335,10 @@ body::after {
 /* Modal Popup Overlays & Native Bottom Sheets */
 .system-modal-overlay {
   position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   inset: 0;
   background: rgba(3, 7, 18, 0.85);
   backdrop-filter: blur(12px);

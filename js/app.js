@@ -629,30 +629,45 @@ function initDungeonsUI() {
   }
 
   // Next / Prev / Clear / Flag / Submit Actions
-  document.getElementById('cbt-next-btn')?.addEventListener('click', () => {
-    dungeons.nextQuestion();
-    renderActiveQuestion();
-  });
+  const cbtNext = document.getElementById('cbt-next-btn');
+  if (cbtNext) {
+    cbtNext.addEventListener('click', () => {
+      dungeons.nextQuestion();
+      renderActiveQuestion();
+    });
+  }
 
-  document.getElementById('cbt-prev-btn')?.addEventListener('click', () => {
-    dungeons.prevQuestion();
-    renderActiveQuestion();
-  });
+  const cbtPrev = document.getElementById('cbt-prev-btn');
+  if (cbtPrev) {
+    cbtPrev.addEventListener('click', () => {
+      dungeons.prevQuestion();
+      renderActiveQuestion();
+    });
+  }
 
-  document.getElementById('cbt-clear-btn')?.addEventListener('click', () => {
-    dungeons.clearResponse();
-    renderActiveQuestion();
-  });
+  const cbtClear = document.getElementById('cbt-clear-btn');
+  if (cbtClear) {
+    cbtClear.addEventListener('click', () => {
+      dungeons.clearResponse();
+      renderActiveQuestion();
+    });
+  }
 
-  document.getElementById('cbt-flag-btn')?.addEventListener('click', () => {
-    dungeons.toggleFlag();
-    renderActiveQuestion();
-  });
+  const cbtFlag = document.getElementById('cbt-flag-btn');
+  if (cbtFlag) {
+    cbtFlag.addEventListener('click', () => {
+      dungeons.toggleFlag();
+      renderActiveQuestion();
+    });
+  }
 
-  document.getElementById('cbt-submit-test-btn')?.addEventListener('click', () => {
-    const res = dungeons.submitRaid();
-    if (res) renderRaidScoreboard(res);
-  });
+  const cbtSubmit = document.getElementById('cbt-submit-test-btn');
+  if (cbtSubmit) {
+    cbtSubmit.addEventListener('click', () => {
+      const res = dungeons.submitRaid();
+      if (res) renderRaidScoreboard(res);
+    });
+  }
 
   // Timer Tick Event
   window.addEventListener('raid-timer-tick', (e) => {
@@ -1936,9 +1951,12 @@ function initLeaderboardUI() {
   }
 
   // Load when user clicks on Rankings tab
-  document.querySelector('[data-tab="tab-leaderboard"]')?.addEventListener('click', () => {
-    renderLeaderboard();
-  });
+  const leadTab = document.querySelector('[data-tab="tab-leaderboard"]');
+  if (leadTab) {
+    leadTab.addEventListener('click', () => {
+      renderLeaderboard();
+    });
+  }
 }
 
 /* ==========================================================================
@@ -2143,9 +2161,12 @@ function initAdminPortalUI() {
   if (targetFilter) targetFilter.addEventListener('change', renderTableRows);
 
   // Auto load when admin tab is opened
-  document.querySelector('[data-tab="tab-admin"]')?.addEventListener('click', () => {
-    checkAdminLockState();
-  });
+  const adminTab = document.querySelector('[data-tab="tab-admin"]');
+  if (adminTab) {
+    adminTab.addEventListener('click', () => {
+      checkAdminLockState();
+    });
+  }
 }
 
 
