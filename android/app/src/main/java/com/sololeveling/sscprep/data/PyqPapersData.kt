@@ -62,12 +62,12 @@ object PyqPapersData {
                     difficulty = "Hard",
                     examTag = "SSC CGL 2025 Tier-2 (Mains)",
                     question = "Statement: 'The government has decided to provide free high-speed Wi-Fi across all public universities to promote digital research.'\nAssumptions:\nI. Most students in public universities will utilize the internet for research.\nII. Free Wi-Fi will reduce university drop-out rates.",
-                    options = [
+                    options = listOf(
                         "Only Assumption I is implicit",
                         "Only Assumption II is implicit",
                         "Both I and II are implicit",
                         "Neither is implicit"
-                    ],
+                    ),
                     correct = 0,
                     explanation = "The stated objective of providing Wi-Fi is specifically 'to promote digital research'. Thus, it assumes students will use it for that intended purpose (Assumption I). There is no causal premise linking Wi-Fi directly to student drop-out retention in the statement.",
                     trick = "Check direct alignment with the stated policy objective."
@@ -79,12 +79,12 @@ object PyqPapersData {
                     difficulty = "Medium",
                     examTag = "SSC CGL 2025 Tier-2 (Mains)",
                     question = "Change to Passive Voice: 'The Shadow Monarch summoned thousands of elite shadow soldiers in an instant.'",
-                    options = [
+                    options = listOf(
                         "Thousands of elite shadow soldiers were summoned by the Shadow Monarch in an instant.",
                         "Thousands of elite shadow soldiers have been summoned by the Shadow Monarch in an instant.",
                         "Thousands of elite shadow soldiers are summoned by the Shadow Monarch in an instant.",
                         "Thousands of elite shadow soldiers had been summoned by the Shadow Monarch in an instant."
-                    ],
+                    ),
                     correct = 0,
                     explanation = "Simple Past active ('summoned') converts to Passive Voice with 'were + V3 (summoned)' for a plural object ('thousands of soldiers').",
                     trick = "Simple past 'summoned' -> was/were + summoned. Subject is plural -> were summoned."
@@ -123,7 +123,7 @@ object PyqPapersData {
                     difficulty = "Medium",
                     examTag = "SSC CGL 2024 Tier-1",
                     question = "Which of the following rivers originates from the Trimbakeshwar plateau in the Nashik district of Maharashtra?",
-                    options = ["Godavari", "Krishna", "Kaveri", "Mahanadi"],
+                    options = listOf("Godavari", "Krishna", "Kaveri", "Mahanadi"),
                     correct = 0,
                     explanation = "The Godavari (often called Dakshin Ganga) originates from Trimbakeshwar near Nashik, Maharashtra. Krishna originates from Mahabaleshwar, Kaveri from Talakaveri (Brahmagiri hills), and Mahanadi from Sihawa in Chhattisgarh.",
                     trick = "Trimbakeshwar (Nashik) -> Godavari (Longest river in Peninsular India)."
