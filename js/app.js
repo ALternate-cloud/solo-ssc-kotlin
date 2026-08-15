@@ -18,15 +18,36 @@ document.addEventListener('DOMContentLoaded', () => {
   initLeaderboardUI();
   initAdminPortalUI();
   initAudioControls();
+  initSettingsUI();
 
   // Periodic Timer Tick for Daily Quests
   setInterval(() => {
     updateQuestCountdown();
   }, 1000);
 
-  // Global Keybindings (e.g. Esc to close modals)
+  // Haptic feedback utility
+  window.triggerHaptic = function(type = 'light') {
+    if (localStorage.getItem('solo_system_haptics_enabled') === 'false') return;
+    if ('vibrate' in navigator) {
+      try {
+        if (type === 'light') navigator.vibrate(10);
+        else if (type === 'medium') navigator.vibrate(22);
+        else if (type === 'heavy') navigator.vibrate([30, 40, 30]);
+        else if (type === 'success') navigator.vibrate([15, 30, 40]);
+      } catch (e) {}
+    }
+  };
+
+  // Global Keybindings & Android Back Button (e.g. Esc/Back to close sheets/modals)
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
+      closeAllModals();
+    }
+  });
+
+  window.addEventListener('popstate', () => {
+    const activeModal = document.querySelector('.system-modal-overlay.active');
+    if (activeModal) {
       closeAllModals();
     }
   });
@@ -38,28 +59,107 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ==========================================================================
-   1. NAVIGATION & TABS
+   1. NAVIGATION & MOBILE APP DOCK
    ========================================================================== */
-function initNavigation() {
-  const tabs = document.querySelectorAll('.nav-tab-btn');
+function switchTab(targetId) {
+  if (!targetId) return;
+
+  const allNavButtons = document.querySelectorAll('.nav-dock-btn[data-tab], .guild-drawer-card[data-tab], .nav-tab-btn[data-tab]');
   const panels = document.querySelectorAll('.viewport-tab-panel');
 
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      const targetId = tab.getAttribute('data-tab');
-
-      tabs.forEach(t => t.classList.remove('active'));
-      panels.forEach(p => p.classList.remove('active'));
-
-      tab.classList.add('active');
-      const targetPanel = document.getElementById(targetId);
-      if (targetPanel) {
-        targetPanel.classList.add('active');
-      }
-
-      if (window.SystemAudio) window.SystemAudio.playClick();
-    });
+  // Update active state on all buttons
+  allNavButtons.forEach(btn => {
+    if (btn.getAttribute('data-tab') === targetId) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
   });
+
+  // Active state for Guild dock button if a drawer sub-tab is open
+  const guildDrawerTabs = ['tab-shadows', 'tab-leaderboard', 'tab-focus', 'tab-shop', 'tab-syllabus', 'tab-admin'];
+  const guildTriggerBtn = document.getElementById('guild-menu-trigger-btn');
+  if (guildTriggerBtn) {
+    if (guildDrawerTabs.includes(targetId)) {
+      guildTriggerBtn.classList.add('active');
+    } else if (['tab-status', 'tab-quests', 'tab-vault', 'tab-dungeons'].includes(targetId)) {
+      guildTriggerBtn.classList.remove('active');
+    }
+  }
+
+  // Switch Viewport Panel
+  panels.forEach(p => p.classList.remove('active'));
+  const targetPanel = document.getElementById(targetId);
+  if (targetPanel) {
+    targetPanel.classList.add('active');
+    const viewportContainer = document.querySelector('.system-viewports');
+    if (viewportContainer) {
+      viewportContainer.scrollTop = 0;
+    }
+  }
+
+  // Sub-tab auto-renderers
+  if (targetId === 'tab-leaderboard' && typeof renderLeaderboard === 'function') {
+    renderLeaderboard();
+  }
+  if (targetId === 'tab-admin' && typeof renderAdminPortal === 'function') {
+    renderAdminPortal();
+  }
+
+  // Sound and Haptics
+  if (window.SystemAudio) window.SystemAudio.playClick();
+  if (window.triggerHaptic) window.triggerHaptic('light');
+
+  // Close any open bottom sheets
+  closeAllModals();
+
+  // History sync
+  try {
+    history.replaceState(null, '', `#${targetId}`);
+  } catch (e) {}
+}
+window.switchTab = switchTab;
+
+function initNavigation() {
+  // Delegate clicks for data-tab anywhere in app
+  document.addEventListener('click', (e) => {
+    const tabTarget = e.target.closest('[data-tab]');
+    if (tabTarget) {
+      const targetId = tabTarget.getAttribute('data-tab');
+      if (targetId) {
+        e.preventDefault();
+        switchTab(targetId);
+      }
+    }
+  });
+
+  // Mobile Guild Menu Bottom Sheet Toggle
+  const guildTrigger = document.getElementById('guild-menu-trigger-btn');
+  const guildSheet = document.getElementById('guild-menu-sheet');
+  if (guildTrigger && guildSheet) {
+    guildTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (window.triggerHaptic) window.triggerHaptic('medium');
+      if (window.SystemAudio) window.SystemAudio.playClick();
+      guildSheet.classList.toggle('active');
+    });
+  }
+
+  // Mobile Top Bar Home click
+  const homeBtn = document.getElementById('mobile-home-btn');
+  if (homeBtn) {
+    homeBtn.addEventListener('click', () => {
+      switchTab('tab-status');
+    });
+  }
+
+  // Check initial hash in URL
+  if (window.location.hash) {
+    const initialTab = window.location.hash.replace('#', '');
+    if (document.getElementById(initialTab)) {
+      switchTab(initialTab);
+    }
+  }
 }
 
 /* ==========================================================================
@@ -1200,8 +1300,228 @@ function closeAllModals() {
 }
 
 document.querySelectorAll('.modal-close-btn').forEach(btn => {
-  btn.addEventListener('click', closeAllModals);
+  btn.addEventListener('click', () => {
+    closeAllModals();
+    if (window.triggerHaptic) window.triggerHaptic('light');
+  });
 });
+
+// Backdrop tap dismiss for bottom sheets & modals
+document.querySelectorAll('.system-modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) {
+      closeAllModals();
+      if (window.triggerHaptic) window.triggerHaptic('light');
+    }
+  });
+});
+
+/* ==========================================================================
+   11.5 SYSTEM SETTINGS & PREFERENCES CONTROLLER
+   ========================================================================== */
+function openSettings(e) {
+  if (e && e.stopPropagation) {
+    e.stopPropagation();
+    e.preventDefault();
+  }
+  closeAllModals();
+  if (typeof updateSettingsDisplay === 'function') {
+    updateSettingsDisplay();
+  }
+  const modal = document.getElementById('system-settings-modal');
+  if (modal) {
+    modal.classList.add('active');
+    if (window.triggerHaptic) window.triggerHaptic('medium');
+    if (window.SystemAudio) window.SystemAudio.playClick();
+  }
+}
+window.openSettings = openSettings;
+
+function initSettingsUI() {
+  const hudSettingsBtn = document.getElementById('hud-settings-btn');
+  const guildSettingsCard = document.getElementById('guild-settings-card');
+
+  if (hudSettingsBtn) hudSettingsBtn.addEventListener('click', openSettings);
+  if (guildSettingsCard) guildSettingsCard.addEventListener('click', openSettings);
+
+  // Update Settings Session Display
+  function updateSettingsDisplay() {
+    const auth = window.AuthClient;
+    const accountNameEl = document.getElementById('settings-account-name');
+    const accountStatusEl = document.getElementById('settings-account-status');
+    const loginBtn = document.getElementById('settings-login-btn');
+    const signoutBtn = document.getElementById('settings-signout-btn');
+    const avatarIconEl = document.getElementById('settings-avatar-icon');
+
+    if (auth && auth.currentUser) {
+      if (accountNameEl) accountNameEl.textContent = auth.currentUser.hunterName || auth.currentUser.username;
+      if (accountStatusEl) accountStatusEl.textContent = `Awakened Hunter • @${auth.currentUser.username} (Synced)`;
+      if (avatarIconEl) avatarIconEl.textContent = '👑';
+      if (loginBtn) loginBtn.style.display = 'none';
+      if (signoutBtn) signoutBtn.style.display = 'inline-flex';
+    } else {
+      const pName = (window.Player && window.Player.data) ? window.Player.data.name : 'Guest Hunter';
+      if (accountNameEl) accountNameEl.textContent = pName;
+      if (accountStatusEl) accountStatusEl.textContent = 'Local Guest Mode (Not Synced to Cloud)';
+      if (avatarIconEl) avatarIconEl.textContent = '🗡️';
+      if (loginBtn) loginBtn.style.display = 'inline-flex';
+      if (signoutBtn) signoutBtn.style.display = 'none';
+    }
+  }
+
+  // 1. Sign Out Button
+  const signoutBtn = document.getElementById('settings-signout-btn');
+  if (signoutBtn) {
+    signoutBtn.addEventListener('click', () => {
+      if (window.AuthClient) {
+        window.AuthClient.clearSession();
+        updateSettingsDisplay();
+        if (window.triggerHaptic) window.triggerHaptic('heavy');
+        showSystemNotification('HUNTER SIGNED OUT', 'You have successfully signed out of the System network. Switched to local mode.');
+      }
+    });
+  }
+
+  // 2. Login Button inside Settings
+  const loginBtn = document.getElementById('settings-login-btn');
+  if (loginBtn) {
+    loginBtn.addEventListener('click', () => {
+      closeAllModals();
+      const authModal = document.getElementById('auth-modal');
+      if (authModal) authModal.classList.add('active');
+    });
+  }
+
+  // 3. Master Sound Switch
+  const soundToggle = document.getElementById('settings-sound-toggle');
+  const hudSoundBtn = document.getElementById('hud-sound-toggle-btn');
+  if (soundToggle && window.SystemAudio) {
+    soundToggle.checked = window.SystemAudio.soundEnabled;
+    soundToggle.addEventListener('change', (e) => {
+      const enabled = window.SystemAudio.setSoundEnabled(e.target.checked);
+      if (hudSoundBtn) {
+        hudSoundBtn.textContent = enabled ? '🔊' : '🔇';
+        hudSoundBtn.classList.toggle('active', enabled);
+      }
+      if (window.triggerHaptic) window.triggerHaptic('light');
+    });
+  }
+
+  // 4. Volume Slider & Label
+  const volumeSlider = document.getElementById('settings-volume-slider');
+  const volumeLabel = document.getElementById('settings-volume-label');
+  if (volumeSlider && window.SystemAudio) {
+    const currVol = Math.round(window.SystemAudio.volume * 100);
+    volumeSlider.value = currVol;
+    if (volumeLabel) volumeLabel.textContent = `${currVol}%`;
+
+    volumeSlider.addEventListener('input', (e) => {
+      const val = parseInt(e.target.value, 10);
+      window.SystemAudio.setVolume(val / 100);
+      if (volumeLabel) volumeLabel.textContent = `${val}%`;
+    });
+  }
+
+  // 5. Test Sound Chime
+  const testSoundBtn = document.getElementById('settings-test-sound-btn');
+  if (testSoundBtn && window.SystemAudio) {
+    testSoundBtn.addEventListener('click', () => {
+      window.SystemAudio.playSystemAlert();
+      if (window.triggerHaptic) window.triggerHaptic('light');
+    });
+  }
+
+  // 6. Ambient 10Hz Alpha Drone
+  const ambientBtn = document.getElementById('settings-ambient-btn');
+  if (ambientBtn && window.SystemAudio) {
+    ambientBtn.addEventListener('click', () => {
+      const playing = window.SystemAudio.startAmbientFocus();
+      ambientBtn.textContent = playing ? '■ STOP DRONE' : '▶ PLAY DRONE';
+      ambientBtn.classList.toggle('sys-btn-primary', playing);
+      if (window.triggerHaptic) window.triggerHaptic('medium');
+    });
+  }
+
+  // 7. Haptic Vibration Toggle & Test
+  const hapticToggle = document.getElementById('settings-haptic-toggle');
+  if (hapticToggle) {
+    hapticToggle.checked = localStorage.getItem('solo_system_haptics_enabled') !== 'false';
+    hapticToggle.addEventListener('change', (e) => {
+      localStorage.setItem('solo_system_haptics_enabled', e.target.checked.toString());
+      if (e.target.checked && window.triggerHaptic) window.triggerHaptic('light');
+    });
+  }
+
+  const testVibrateBtn = document.getElementById('settings-test-vibrate-btn');
+  if (testVibrateBtn) {
+    testVibrateBtn.addEventListener('click', () => {
+      if ('vibrate' in navigator) {
+        navigator.vibrate([20, 50, 20]);
+      }
+    });
+  }
+
+  // 8. Battery Saver Mode Toggle
+  const batteryToggle = document.getElementById('settings-battery-saver-toggle');
+  if (batteryToggle) {
+    const isBatterySaver = localStorage.getItem('solo_system_battery_saver') === 'true';
+    batteryToggle.checked = isBatterySaver;
+    if (isBatterySaver) document.body.classList.add('battery-saver');
+
+    batteryToggle.addEventListener('change', (e) => {
+      localStorage.setItem('solo_system_battery_saver', e.target.checked.toString());
+      document.body.classList.toggle('battery-saver', e.target.checked);
+      if (window.triggerHaptic) window.triggerHaptic('light');
+    });
+  }
+
+  // 9. Fullscreen Toggle
+  const fullscreenBtn = document.getElementById('settings-fullscreen-btn');
+  if (fullscreenBtn) {
+    fullscreenBtn.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+        fullscreenBtn.textContent = '✕ EXIT FULLSCREEN';
+      } else {
+        document.exitFullscreen().catch(() => {});
+        fullscreenBtn.textContent = '⛶ FULLSCREEN';
+      }
+      if (window.triggerHaptic) window.triggerHaptic('light');
+    });
+  }
+
+  // 10. Manual Cloud Sync
+  const syncNowBtn = document.getElementById('settings-sync-now-btn');
+  if (syncNowBtn) {
+    syncNowBtn.addEventListener('click', async () => {
+      if (window.triggerHaptic) window.triggerHaptic('medium');
+      syncNowBtn.textContent = '⏳ SYNCING...';
+      if (window.OnlineSync) {
+        await window.OnlineSync.syncWithBackend();
+      }
+      setTimeout(() => {
+        syncNowBtn.textContent = '✓ SYNCED';
+        setTimeout(() => { syncNowBtn.textContent = '🔄 SYNC NOW'; }, 2000);
+      }, 500);
+    });
+  }
+
+  // 11. Reset Local Progress Danger Action
+  const resetBtn = document.getElementById('settings-reset-data-btn');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      const confirmed = window.confirm('⚠️ WARNING: Are you sure you want to reset all local Hunter stats, EXP, gold, and progress back to Level 1?');
+      if (confirmed) {
+        localStorage.removeItem('solo_leveling_exam_player');
+        localStorage.removeItem('solo_system_daily_quests');
+        localStorage.removeItem('solo_system_shadow_army');
+        if (window.triggerHaptic) window.triggerHaptic('heavy');
+        alert('System reset complete. Reloading...');
+        window.location.reload();
+      }
+    });
+  }
+}
 
 // Penalty Modal
 function openPenaltyModal() {

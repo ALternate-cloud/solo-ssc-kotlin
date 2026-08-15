@@ -1,82 +1,193 @@
 /* ==========================================================================
-   SOLO LEVELING EXAM PREPARATION SYSTEM - RESPONSIVENESS
+   SOLO LEVELING EXAM PREPARATION SYSTEM - COMPREHENSIVE RESPONSIVENESS
    ========================================================================== */
 
+/* Large Tablets & Small Laptops (768px - 1024px) */
 @media (max-width: 1024px) {
-  .grid-2col {
-    grid-template-columns: 1fr;
-  }
-  
   .cbt-exam-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .system-top-hud {
-    flex-direction: column;
-    gap: 12px;
-    align-items: flex-start;
-  }
-  
-  .hud-actions {
-    align-self: flex-end;
+    grid-template-columns: 1fr 240px;
+    gap: 14px;
   }
 }
 
-@media (max-width: 768px) {
-  .system-app-container {
-    padding: 10px 10px 50px 10px;
+/* Tablets & Mobile Screens (<= 850px) */
+@media (max-width: 850px) {
+  .cbt-exam-grid {
+    grid-template-columns: 1fr;
     gap: 14px;
   }
-  
-  .hud-quick-stats {
+
+  .cbt-palette-panel {
+    max-height: 200px;
+  }
+
+  .cbt-palette-grid {
+    grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
+    gap: 6px;
+  }
+
+  .cbt-action-row {
     flex-wrap: wrap;
     gap: 8px;
   }
-  
+
+  .cbt-action-row .sys-btn {
+    flex: 1 1 calc(50% - 8px);
+    padding: 10px 8px;
+    font-size: 0.75rem;
+  }
+
+  .guild-drawer-grid {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  }
+}
+
+/* Standard Mobile Devices (<= 640px) */
+@media (max-width: 640px) {
+  .system-top-hud {
+    padding: calc(var(--sat) + 6px) 10px 6px 10px;
+    gap: 6px;
+  }
+
+  .hud-main-title {
+    font-size: 0.85rem;
+  }
+
   .hud-stat-pill {
-    padding: 4px 10px;
+    padding: 2px 6px;
+    font-size: 0.7rem;
+    gap: 4px;
   }
-  
-  .system-nav-tabs {
+
+  .hud-stat-label {
+    display: none;
+  }
+
+  .hud-actions {
+    gap: 4px;
+  }
+
+  .hud-icon-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 0.88rem;
+  }
+
+  #hud-auth-btn {
+    padding: 4px 8px !important;
+    font-size: 0.68rem !important;
+  }
+
+  /* Hunter Profile ID Card */
+  .hunter-header-row {
     flex-direction: row;
-    overflow-x: auto;
-    padding: 6px 8px;
-    gap: 8px;
-    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
   }
-  
-  .nav-tabs-group {
+
+  .hunter-avatar-box {
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
     flex-shrink: 0;
   }
-  
-  .nav-tab-btn {
+
+  .hunter-name-input {
+    font-size: 1rem;
+  }
+
+  /* Focus Clock Timer */
+  .focus-timer-display {
+    font-size: 3rem;
+  }
+
+  .focus-controls-row {
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  /* Vault & Practice Filter Bars */
+  .vault-filter-bar {
+    display: flex;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    gap: 6px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .vault-filter-btn {
+    flex-shrink: 0;
+    white-space: nowrap;
     padding: 6px 10px;
     font-size: 0.72rem;
   }
-  
-  .focus-timer-display {
-    font-size: 3.2rem;
-  }
-  
-  .hunter-header-row {
-    flex-direction: column;
-    text-align: center;
-    align-items: center;
-  }
-  
-  .reward-items-row {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-  
+
+  /* Quests & Rewards */
   .quest-reward-strip {
     flex-direction: column;
-    gap: 14px;
+    gap: 10px;
     align-items: stretch;
   }
-  
+
+  .reward-items-row {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  /* Modals as Full Mobile Bottom Sheets */
+  .system-modal-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
   .system-modal-window {
-    padding: 16px;
+    border-radius: 20px 20px 0 0;
+    max-width: 100%;
+    max-height: 86vh;
+    padding: 16px 16px calc(16px + var(--sab)) 16px;
+    border-bottom: none;
+    box-sizing: border-box;
+  }
+
+  .sheet-drag-handle {
+    display: block;
+  }
+
+  .guild-drawer-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Ultra-Compact Screens (<= 380px, e.g. iPhone SE / Galaxy Fold) */
+@media (max-width: 380px) {
+  .hud-branding .hud-sys-label {
+    display: none;
+  }
+
+  .hud-main-title {
+    font-size: 0.78rem;
+  }
+
+  .system-emblem {
+    width: 28px;
+    height: 28px;
+    font-size: 1rem;
+  }
+
+  .nav-dock-btn {
+    padding: 3px 4px;
+  }
+
+  .nav-dock-icon {
+    font-size: 1.15rem;
+  }
+
+  .nav-dock-label {
+    font-size: 0.54rem;
+  }
+
+  .cbt-action-row .sys-btn {
+    flex: 1 1 100%;
   }
 }

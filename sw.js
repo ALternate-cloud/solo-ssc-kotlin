@@ -1,5 +1,5 @@
 // Service Worker for Solo Leveling SSC CGL PWA / APK
-const CACHE_NAME = 'solo-leveling-ssc-v3';
+const CACHE_NAME = 'solo-leveling-ssc-v4';
 const OFFLINE_URL = '/offline.html';
 const ASSETS_TO_CACHE = [
   '/',

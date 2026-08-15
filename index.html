@@ -2,15 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>THE SYSTEM - Solo Leveling Exam Preparation HUD</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>THE SYSTEM - Solo Leveling Exam Preparation Mobile App</title>
   <meta name="description" content="Gamified Solo Leveling RPG exam preparation system for SSC CGL, CHSL, MTS, and competitive exams. Daily quests, Question Vault, Boss CBT Mocks, and ARISE error extraction.">
   
   <!-- Mobile & PWA App Metadata -->
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <meta name="theme-color" content="#00f2ff">
+  <meta name="theme-color" content="#060a14">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -24,89 +24,50 @@
 </head>
 <body>
 
-  <!-- Main System Application Shell -->
+  <!-- Main Mobile App Shell -->
   <div class="system-app-container">
 
-    <!-- TOP HUD BAR -->
-    <header class="system-top-hud hologram-corners">
-      <div class="hud-branding">
+    <!-- NATIVE MOBILE TOP APP BAR -->
+    <header class="system-top-hud">
+      <div class="hud-branding" id="mobile-home-btn" title="Solo Leveling System">
         <div class="system-emblem">⚡</div>
         <div class="hud-title-group">
-          <span class="hud-sys-label">[SYSTEM ARCHITECT: EXAM SLAYER]</span>
-          <h1 class="hud-main-title">SOLO LEVELING EXAM PREPARATION</h1>
+          <span class="hud-sys-label">[THE SYSTEM]</span>
+          <h1 class="hud-main-title">SOLO SSC</h1>
         </div>
       </div>
 
       <div class="hud-quick-stats">
-        <div class="hud-stat-pill">
-          <span class="hud-stat-label">LEVEL</span>
+        <div class="hud-stat-pill" title="Player Level">
+          <span class="hud-stat-label">LVL</span>
           <span class="hud-stat-val text-cyan" id="hud-player-level">LVL 1</span>
         </div>
-        <div class="hud-stat-pill">
-          <span class="hud-stat-label">RANK</span>
-          <span class="rank-badge rank-E" id="hud-player-rank">E-RANK</span>
+        <div class="hud-stat-pill" title="Hunter Rank">
+          <span class="rank-badge rank-E" id="hud-player-rank">E</span>
         </div>
-        <div class="hud-stat-pill">
-          <span class="hud-stat-label">GOLD</span>
+        <div class="hud-stat-pill" title="Hunter Gold">
+          <span class="hud-stat-label">💰</span>
           <span class="hud-stat-val text-gold" id="hud-player-gold">150 G</span>
         </div>
       </div>
 
       <div class="hud-actions">
-        <button id="hud-auth-btn" class="sys-btn sys-btn-primary" style="padding: 6px 12px; font-size: 0.75rem;">
-          ⚡ AWAKEN / LOGIN
+        <button id="hud-auth-btn" class="sys-btn sys-btn-primary" style="padding: 5px 10px; font-size: 0.72rem;">
+          ⚡ LOGIN
         </button>
-        <div id="hud-user-pill" style="display: none; align-items: center; gap: 8px;" class="hud-stat-pill">
+        <div id="hud-user-pill" style="display: none; align-items: center; gap: 6px;" class="hud-stat-pill">
           <span style="color: #22c55e;">🟢</span>
-          <span id="hud-username-display" class="font-hud" style="font-size: 0.8rem; color: #fff;">Hunter</span>
-          <button id="hud-logout-btn" style="background: transparent; border: none; color: #ff3366; cursor: pointer; font-size: 0.75rem; margin-left: 4px;" title="Logout">LOGOUT</button>
+          <span id="hud-username-display" class="font-hud" style="font-size: 0.78rem; color: #fff; max-width: 70px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Hunter</span>
+          <button id="hud-logout-btn" style="background: transparent; border: none; color: #ff3366; cursor: pointer; font-size: 0.75rem; margin-left: 2px;" title="Logout">✕</button>
         </div>
-        <button class="hud-icon-btn active" id="hud-sound-toggle-btn" title="Toggle System Sound SFX" aria-label="Toggle Sound">
+        <button class="hud-icon-btn active" id="hud-sound-toggle-btn" title="Toggle System SFX" aria-label="Toggle Sound">
           🔊
+        </button>
+        <button class="hud-icon-btn" id="hud-settings-btn" onclick="window.openSettings && window.openSettings(event)" title="System Settings & Sign Out" aria-label="Open Settings">
+          ⚙️
         </button>
       </div>
     </header>
-
-    <!-- SYSTEM NAVIGATION TABS -->
-    <nav class="system-nav-tabs" aria-label="Main Navigation">
-      <div class="nav-tabs-group">
-        <button class="nav-tab-btn active" data-tab="tab-status">
-          <span class="nav-icon">👤</span> STATUS
-        </button>
-        <button class="nav-tab-btn" data-tab="tab-vault">
-          <span class="nav-icon">📚</span> VAULT
-        </button>
-        <button class="nav-tab-btn" data-tab="tab-quests">
-          <span class="nav-icon">📜</span> QUESTS <span class="tab-badge" id="nav-quest-badge">!</span>
-        </button>
-        <button class="nav-tab-btn" data-tab="tab-dungeons">
-          <span class="nav-icon">⚔️</span> RAIDS & MOCKS
-        </button>
-        <button class="nav-tab-btn" data-tab="tab-shadows">
-          <span class="nav-icon">👑</span> SHADOW ARMY
-        </button>
-      </div>
-
-      <div class="nav-divider"></div>
-
-      <div class="nav-tabs-group">
-        <button class="nav-tab-btn" data-tab="tab-leaderboard">
-          <span class="nav-icon">🏆</span> RANKINGS
-        </button>
-        <button class="nav-tab-btn" data-tab="tab-focus">
-          <span class="nav-icon">⏳</span> FOCUS
-        </button>
-        <button class="nav-tab-btn" data-tab="tab-shop">
-          <span class="nav-icon">💎</span> SHOP
-        </button>
-        <button class="nav-tab-btn" data-tab="tab-syllabus">
-          <span class="nav-icon">🌐</span> SYLLABUS
-        </button>
-        <button class="nav-tab-btn" data-tab="tab-admin" style="border-color: rgba(255, 215, 0, 0.4); color: var(--sys-gold);">
-          <span class="nav-icon">📊</span> GUILD HQ
-        </button>
-      </div>
-    </nav>
 
     <!-- MAIN VIEWPORTS -->
     <main class="system-viewports">
@@ -906,15 +867,108 @@
 
     </main>
 
+    <!-- FIXED NATIVE MOBILE BOTTOM NAVIGATION DOCK -->
+    <nav class="mobile-bottom-nav" aria-label="Mobile Bottom Dock">
+      <button class="nav-dock-btn active" data-tab="tab-status" title="Status & Hunter ID">
+        <span class="nav-dock-icon">👤</span>
+        <span class="nav-dock-label">Status</span>
+      </button>
+      <button class="nav-dock-btn" data-tab="tab-quests" title="Daily Quests">
+        <span class="nav-dock-icon">📜</span>
+        <span class="nav-dock-label">Quests</span>
+        <span class="dock-badge" id="nav-quest-badge" style="display: none;">!</span>
+      </button>
+      <button class="nav-dock-btn" data-tab="tab-vault" title="Question Vault">
+        <span class="nav-dock-icon">📚</span>
+        <span class="nav-dock-label">Vault</span>
+      </button>
+      <button class="nav-dock-btn" data-tab="tab-dungeons" title="CBT Mocks & Raids">
+        <span class="nav-dock-icon">⚔️</span>
+        <span class="nav-dock-label">Raids</span>
+      </button>
+      <button class="nav-dock-btn" id="guild-menu-trigger-btn" type="button" title="Guild Menu & More">
+        <span class="nav-dock-icon">☰</span>
+        <span class="nav-dock-label">Guild</span>
+      </button>
+    </nav>
+
   </div>
 
   <!-- ====================================================================
-       SYSTEM MODALS & POPUPS
+       SYSTEM MODALS & NATIVE BOTTOM SHEETS
        ==================================================================== -->
+
+  <!-- 0. Mobile Guild Menu Bottom Sheet Drawer -->
+  <div id="guild-menu-sheet" class="system-modal-overlay">
+    <div class="system-modal-window">
+      <div class="sheet-drag-handle"></div>
+      <div class="modal-header">
+        <div class="modal-title">
+          <span>👑</span> <span>HUNTER GUILD & SYSTEM</span>
+        </div>
+        <button class="modal-close-btn" id="guild-sheet-close-btn">&times;</button>
+      </div>
+      <p style="font-size: 0.8rem; color: var(--sys-text-dim); margin-bottom: 12px;">
+        Select a system module or guild chamber:
+      </p>
+      <div class="guild-drawer-grid">
+        <div class="guild-drawer-card" data-tab="tab-shadows">
+          <div class="guild-card-icon" style="color: #c084fc;">👑</div>
+          <div class="guild-card-info">
+            <span class="guild-card-title text-shadow">SHADOW ARMY</span>
+            <span class="guild-card-desc">Extracted Concepts & Arise</span>
+          </div>
+        </div>
+        <div class="guild-drawer-card" data-tab="tab-leaderboard">
+          <div class="guild-card-icon" style="color: #fbbf24;">🏆</div>
+          <div class="guild-card-info">
+            <span class="guild-card-title text-gold">RANKINGS</span>
+            <span class="guild-card-desc">Hunter Leaderboard</span>
+          </div>
+        </div>
+        <div class="guild-drawer-card" data-tab="tab-focus">
+          <div class="guild-card-icon" style="color: #38bdf8;">⏳</div>
+          <div class="guild-card-info">
+            <span class="guild-card-title text-cyan">FOCUS CLOCK</span>
+            <span class="guild-card-desc">Pomodoro Study Deep Flow</span>
+          </div>
+        </div>
+        <div class="guild-drawer-card" data-tab="tab-shop">
+          <div class="guild-card-icon" style="color: #a855f7;">💎</div>
+          <div class="guild-card-info">
+            <span class="guild-card-title" style="color: #a855f7;">HUNTER SHOP</span>
+            <span class="guild-card-desc">Potions, Elixirs & Buffs</span>
+          </div>
+        </div>
+        <div class="guild-drawer-card" data-tab="tab-syllabus">
+          <div class="guild-card-icon" style="color: #34d399;">🌐</div>
+          <div class="guild-card-info">
+            <span class="guild-card-title" style="color: #34d399;">SYLLABUS</span>
+            <span class="guild-card-desc">SSC CGL Tier 1 & 2 Roadmap</span>
+          </div>
+        </div>
+        <div class="guild-drawer-card" data-tab="tab-admin">
+          <div class="guild-card-icon" style="color: #f43f5e;">📊</div>
+          <div class="guild-card-info">
+            <span class="guild-card-title" style="color: #f43f5e;">GUILD HQ</span>
+            <span class="guild-card-desc">Live DB, Sync & Metrics</span>
+          </div>
+        </div>
+        <div class="guild-drawer-card" id="guild-settings-card" onclick="window.openSettings && window.openSettings(event)" style="grid-column: 1 / -1; border-color: rgba(0, 242, 255, 0.4); background: rgba(0, 242, 255, 0.05);">
+          <div class="guild-card-icon" style="color: #00f2ff;">⚙️</div>
+          <div class="guild-card-info">
+            <span class="guild-card-title text-cyan">SYSTEM SETTINGS</span>
+            <span class="guild-card-desc">Sign Out, Volume, Haptics, Display & Cloud Sync</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- 1. General System Alert Modal -->
   <div id="system-alert-modal" class="system-modal-overlay">
     <div class="system-modal-window">
+      <div class="sheet-drag-handle"></div>
       <div class="modal-header">
         <div class="modal-title">
           <span>⚡</span> <span id="sys-modal-title">SYSTEM NOTIFICATION</span>
@@ -933,6 +987,7 @@
   <!-- 2. "ARISE" Extraction VFX Modal -->
   <div id="arise-fx-modal" class="system-modal-overlay">
     <div class="system-modal-window" style="background: radial-gradient(circle, #240046, #050811); border-color: #a855f7; box-shadow: var(--glow-shadow-aura); text-align: center; padding: 40px 20px;">
+      <div class="sheet-drag-handle"></div>
       <div style="font-size: 3.5rem; color: #c084fc; margin-bottom: 10px; animation: ariseExtraction 1.5s ease;">
         👑
       </div>
@@ -951,6 +1006,7 @@
   <!-- 3. Penalty Desert Survival Modal -->
   <div id="penalty-zone-modal" class="system-modal-overlay">
     <div class="system-modal-window" style="border-color: var(--sys-red); box-shadow: var(--glow-red);">
+      <div class="sheet-drag-handle"></div>
       <div class="modal-header">
         <div class="modal-title" style="color: var(--sys-red);">
           <span>🌵</span> [PENALTY QUEST: SURVIVAL IN THE DESERT]
@@ -969,6 +1025,7 @@
   <!-- 4. Hunter Awakening / Authentication Modal -->
   <div id="auth-modal" class="system-modal-overlay">
     <div class="system-modal-window" style="max-width: 440px;">
+      <div class="sheet-drag-handle"></div>
       <div class="modal-header">
         <div class="modal-title">
           <span>⚡</span> <span id="auth-modal-title">HUNTER AWAKENING</span>
@@ -1016,6 +1073,174 @@
           AWAKEN AS A PLAYER (SIGN UP) 👑
         </button>
       </form>
+    </div>
+  </div>
+
+  <!-- 5. System Settings & Preferences Modal -->
+  <div id="system-settings-modal" class="system-modal-overlay">
+    <div class="system-modal-window" style="max-width: 540px;">
+      <div class="sheet-drag-handle"></div>
+      <div class="modal-header">
+        <div class="modal-title">
+          <span>⚙️</span> <span>SYSTEM SETTINGS</span>
+        </div>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+
+      <div class="settings-container">
+
+        <!-- Section 1: Hunter Identity & Session -->
+        <div class="settings-section">
+          <div class="settings-section-header">
+            <span>👤</span> HUNTER IDENTITY & SESSION
+          </div>
+          
+          <div class="settings-account-badge">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span style="font-size: 1.6rem;" id="settings-avatar-icon">🗡️</span>
+              <div style="display: flex; flex-direction: column;">
+                <span style="font-family: var(--font-hud); font-weight: 700; color: #fff; font-size: 0.9rem;" id="settings-account-name">Guest Hunter</span>
+                <span style="font-size: 0.72rem; color: var(--sys-text-dim);" id="settings-account-status">Offline / Local Mode</span>
+              </div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button id="settings-login-btn" class="sys-btn sys-btn-primary" style="padding: 6px 12px; font-size: 0.72rem;">
+                ⚡ LOGIN
+              </button>
+              <button id="settings-signout-btn" class="sys-btn sys-btn-danger" style="padding: 6px 12px; font-size: 0.72rem; display: none;">
+                🚪 SIGN OUT
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2: Audio & SFX Controls -->
+        <div class="settings-section">
+          <div class="settings-section-header">
+            <span>🔊</span> SOUND & SFX CONTROLS
+          </div>
+
+          <!-- Master SFX Toggle -->
+          <div class="settings-row">
+            <div class="settings-info">
+              <span class="settings-label">Sound Effects (SFX)</span>
+              <span class="settings-desc">Menu clicks, level-up fanfares, boss hits</span>
+            </div>
+            <label class="sys-switch">
+              <input type="checkbox" id="settings-sound-toggle" checked>
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+
+          <!-- Volume Slider -->
+          <div class="settings-row">
+            <div class="settings-info">
+              <span class="settings-label">Master Volume</span>
+              <span class="settings-desc" id="settings-volume-label">80%</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <input type="range" id="settings-volume-slider" class="sys-slider" min="0" max="100" value="80">
+              <button class="sys-btn" id="settings-test-sound-btn" style="padding: 4px 8px; font-size: 0.65rem;" title="Test Sound Chime">▶ TEST</button>
+            </div>
+          </div>
+
+          <!-- Ambient Binaural Beat -->
+          <div class="settings-row">
+            <div class="settings-info">
+              <span class="settings-label">10Hz Alpha Focus Drone</span>
+              <span class="settings-desc">Binaural study frequency generator</span>
+            </div>
+            <button id="settings-ambient-btn" class="sys-btn" style="padding: 6px 12px; font-size: 0.72rem;">
+              ▶ PLAY DRONE
+            </button>
+          </div>
+        </div>
+
+        <!-- Section 3: Vibration & Haptics -->
+        <div class="settings-section">
+          <div class="settings-section-header">
+            <span>📳</span> HAPTIC FEEDBACK (MOBILE)
+          </div>
+
+          <div class="settings-row">
+            <div class="settings-info">
+              <span class="settings-label">Touch Vibration</span>
+              <span class="settings-desc">Haptic ticks on button taps and quest actions</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <button class="sys-btn" id="settings-test-vibrate-btn" style="padding: 4px 8px; font-size: 0.65rem;">⚡ TEST</button>
+              <label class="sys-switch">
+                <input type="checkbox" id="settings-haptic-toggle" checked>
+                <span class="switch-slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 4: Display & Atmosphere -->
+        <div class="settings-section">
+          <div class="settings-section-header">
+            <span>✨</span> DISPLAY & ATMOSPHERE
+          </div>
+
+          <div class="settings-row">
+            <div class="settings-info">
+              <span class="settings-label">Battery Saver Mode</span>
+              <span class="settings-desc">Reduce glowing animations for smoother performance</span>
+            </div>
+            <label class="sys-switch">
+              <input type="checkbox" id="settings-battery-saver-toggle">
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+
+          <div class="settings-row">
+            <div class="settings-info">
+              <span class="settings-label">App Fullscreen</span>
+              <span class="settings-desc">Toggle edge-to-edge native view</span>
+            </div>
+            <button id="settings-fullscreen-btn" class="sys-btn" style="padding: 6px 12px; font-size: 0.72rem;">
+              ⛶ FULLSCREEN
+            </button>
+          </div>
+        </div>
+
+        <!-- Section 5: Data & System Storage -->
+        <div class="settings-section">
+          <div class="settings-section-header">
+            <span>💾</span> SYSTEM DATA & CLOUD SYNC
+          </div>
+
+          <div class="settings-row">
+            <div class="settings-info">
+              <span class="settings-label">Cloud Synchronization</span>
+              <span class="settings-desc" id="settings-cloud-status">Connected to SQLite Engine</span>
+            </div>
+            <button id="settings-sync-now-btn" class="sys-btn sys-btn-primary" style="padding: 6px 12px; font-size: 0.72rem;">
+              🔄 SYNC NOW
+            </button>
+          </div>
+
+          <div class="settings-danger-box">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <span style="color: var(--sys-red); font-weight: 700; font-size: 0.8rem; font-family: var(--font-hud);">⚠️ RESET LOCAL PROGRESS</span>
+                <p style="font-size: 0.7rem; color: var(--sys-text-dim); margin-top: 2px;">Wipes local guest data and resets Hunter level to 1.</p>
+              </div>
+              <button id="settings-reset-data-btn" class="sys-btn sys-btn-danger" style="padding: 6px 12px; font-size: 0.7rem;">
+                RESET DATA
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 6: About System -->
+        <div style="text-align: center; padding: 8px 0; color: var(--sys-text-dim); font-size: 0.75rem;">
+          <div><strong style="color: var(--sys-cyan); font-family: var(--font-hud);">SOLO LEVELING SSC SYSTEM</strong> • v1.2.0 Native</div>
+          <div style="margin-top: 2px;">Architect: Exam Slayer • CBT Procedural Engine</div>
+        </div>
+
+      </div>
     </div>
   </div>
 

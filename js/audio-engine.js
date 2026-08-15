@@ -6,7 +6,8 @@
 class SystemAudioEngine {
   constructor() {
     this.ctx = null;
-    this.soundEnabled = true;
+    this.soundEnabled = localStorage.getItem('solo_system_sound_enabled') !== 'false';
+    this.volume = parseFloat(localStorage.getItem('solo_system_volume') || '0.8');
     this.ambientPlaying = false;
     this.ambientNodes = [];
   }
@@ -25,7 +26,20 @@ class SystemAudioEngine {
 
   toggleSound() {
     this.soundEnabled = !this.soundEnabled;
+    localStorage.setItem('solo_system_sound_enabled', this.soundEnabled);
     return this.soundEnabled;
+  }
+
+  setSoundEnabled(enabled) {
+    this.soundEnabled = !!enabled;
+    localStorage.setItem('solo_system_sound_enabled', this.soundEnabled);
+    return this.soundEnabled;
+  }
+
+  setVolume(vol) {
+    this.volume = Math.max(0, Math.min(1, parseFloat(vol)));
+    localStorage.setItem('solo_system_volume', this.volume.toString());
+    return this.volume;
   }
 
   // 1. Holographic System Alert Chime
@@ -47,7 +61,7 @@ class SystemAudioEngine {
     osc2.frequency.setValueAtTime(1320, t);
     osc2.frequency.exponentialRampToValueAtTime(2640, t + 0.15);
 
-    gain.gain.setValueAtTime(0.2, t);
+    gain.gain.setValueAtTime(0.25 * this.volume, t);
     gain.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
 
     osc1.connect(gain);
@@ -74,7 +88,7 @@ class SystemAudioEngine {
     osc.frequency.setValueAtTime(1200, t);
     osc.frequency.exponentialRampToValueAtTime(400, t + 0.04);
 
-    gain.gain.setValueAtTime(0.12, t);
+    gain.gain.setValueAtTime(0.14 * this.volume, t);
     gain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
 
     osc.connect(gain);
@@ -101,7 +115,7 @@ class SystemAudioEngine {
       osc.type = 'triangle';
       osc.frequency.setValueAtTime(freq, startTime);
 
-      gain.gain.setValueAtTime(0.2, startTime);
+      gain.gain.setValueAtTime(0.2 * this.volume, startTime);
       gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.5);
 
       osc.connect(gain);
@@ -126,7 +140,7 @@ class SystemAudioEngine {
     osc.frequency.setValueAtTime(isCrit ? 300 : 180, t);
     osc.frequency.exponentialRampToValueAtTime(40, t + 0.25);
 
-    gain.gain.setValueAtTime(isCrit ? 0.35 : 0.2, t);
+    gain.gain.setValueAtTime((isCrit ? 0.35 : 0.2) * this.volume, t);
     gain.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
 
     osc.connect(gain);
