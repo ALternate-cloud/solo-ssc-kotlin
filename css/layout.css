@@ -22,8 +22,9 @@
 .system-top-hud {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: calc(var(--sat) + 6px) 14px 8px 14px;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: calc(var(--sat) + 6px) 10px 8px 10px;
   background: rgba(8, 14, 28, 0.96);
   border-bottom: 1px solid var(--sys-border);
   backdrop-filter: blur(20px);
@@ -35,6 +36,15 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
   width: 100%;
   box-sizing: border-box;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  white-space: nowrap;
+}
+
+.system-top-hud::-webkit-scrollbar {
+  display: none;
 }
 
 .hud-branding {
@@ -64,6 +74,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .hud-sys-label {
@@ -91,7 +102,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  flex-shrink: 1;
+  flex-shrink: 0;
 }
 
 .hud-stat-pill {
@@ -125,6 +136,7 @@
   align-items: center;
   gap: 6px;
   flex-shrink: 0;
+  margin-left: auto;
 }
 
 .hud-icon-btn {

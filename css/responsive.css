@@ -45,8 +45,16 @@
 /* Standard Mobile Devices (<= 640px) */
 @media (max-width: 640px) {
   .system-top-hud {
-    padding: calc(var(--sat) + 6px) 10px 6px 10px;
-    gap: 6px;
+    padding: calc(var(--sat) + 6px) 8px 6px 8px;
+    gap: 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+    scrollbar-width: none;
+  }
+
+  .system-top-hud::-webkit-scrollbar {
+    display: none;
   }
 
   .hud-main-title {
