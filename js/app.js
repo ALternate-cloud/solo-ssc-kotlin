@@ -1475,7 +1475,32 @@ function initSettingsUI() {
     });
   }
 
-  // 9. Fullscreen Toggle
+  // 9. In-App PWA Install Prompt Handler
+  let deferredInstallPrompt = null;
+  const installBtn = document.getElementById('settings-install-app-btn');
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+  });
+
+  if (installBtn) {
+    installBtn.addEventListener('click', async () => {
+      if (window.triggerHaptic) window.triggerHaptic('medium');
+      if (deferredInstallPrompt) {
+        deferredInstallPrompt.prompt();
+        const { outcome } = await deferredInstallPrompt.userChoice;
+        if (outcome === 'accepted') {
+          showSystemNotification('APP INSTALLED', 'Solo SSC has been installed to your home screen! 🗡️');
+        }
+        deferredInstallPrompt = null;
+      } else {
+        alert('📲 TO INSTALL ON THIS PHONE:\n\n1. Tap the 3 dots (⋮) or Share icon in your browser menu.\n2. Tap "Install App" or "Add to Home Screen".\n3. Enjoy fullscreen offline gameplay!');
+      }
+    });
+  }
+
+  // 10. Fullscreen Toggle
   const fullscreenBtn = document.getElementById('settings-fullscreen-btn');
   if (fullscreenBtn) {
     fullscreenBtn.addEventListener('click', () => {
@@ -1490,7 +1515,7 @@ function initSettingsUI() {
     });
   }
 
-  // 10. Manual Cloud Sync
+  // 11. Manual Cloud Sync
   const syncNowBtn = document.getElementById('settings-sync-now-btn');
   if (syncNowBtn) {
     syncNowBtn.addEventListener('click', async () => {
