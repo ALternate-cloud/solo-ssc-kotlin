@@ -246,7 +246,7 @@ fun CbtRaidScreen(
                             onClick = { viewModel.selectOption(optIdx) },
                             colors = RadioButtonDefaults.colors(
                                 selectedColor = SystemPrimary,
-                                uncheckedColor = SystemBorder
+                                unselectedColor = SystemBorder
                             )
                         )
                         Spacer(modifier = Modifier.width(8.dp))
