@@ -3,39 +3,51 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Initialize Application Components
-  initNavigation();
-  initAuthUI();
-  initPlayerUI();
-  initDailySkirmishUI();
-  initQuestionVaultUI();
-  initQuestsUI();
-  initDungeonsUI();
-  initShadowsUI();
-  initFocusDungeonUI();
-  initShopUI();
-  initOnlineSyllabusUI();
-  initLeaderboardUI();
-  initAdminPortalUI();
-  initAudioControls();
-  initSettingsUI();
+  // Initialize Application Components safely
+  const initList = [
+    ['Navigation', initNavigation],
+    ['Auth', initAuthUI],
+    ['Player', initPlayerUI],
+    ['DailySkirmish', initDailySkirmishUI],
+    ['QuestionVault', initQuestionVaultUI],
+    ['Quests', initQuestsUI],
+    ['Dungeons', initDungeonsUI],
+    ['Shadows', initShadowsUI],
+    ['FocusDungeon', initFocusDungeonUI],
+    ['Shop', initShopUI],
+    ['OnlineSyllabus', initOnlineSyllabusUI],
+    ['Leaderboard', initLeaderboardUI],
+    ['AdminPortal', initAdminPortalUI],
+    ['AudioControls', initAudioControls],
+    ['Settings', initSettingsUI]
+  ];
+
+  initList.forEach(([name, fn]) => {
+    try {
+      if (typeof fn === 'function') fn();
+    } catch (err) {
+      console.warn(`[System Engine] Failed to initialize ${name}:`, err);
+    }
+  });
 
   // Periodic Timer Tick for Daily Quests
-  setInterval(() => {
-    updateQuestCountdown();
-  }, 1000);
+  try {
+    setInterval(() => {
+      if (typeof updateQuestCountdown === 'function') updateQuestCountdown();
+    }, 1000);
+  } catch (e) {}
 
   // Haptic feedback utility
   window.triggerHaptic = function(type = 'light') {
-    if (localStorage.getItem('solo_system_haptics_enabled') === 'false') return;
-    if ('vibrate' in navigator) {
-      try {
+    try {
+      if (localStorage.getItem('solo_system_haptics_enabled') === 'false') return;
+      if (typeof navigator !== 'undefined' && 'vibrate' in navigator && typeof navigator.vibrate === 'function') {
         if (type === 'light') navigator.vibrate(10);
         else if (type === 'medium') navigator.vibrate(22);
         else if (type === 'heavy') navigator.vibrate([30, 40, 30]);
         else if (type === 'success') navigator.vibrate([15, 30, 40]);
-      } catch (e) {}
-    }
+      }
+    } catch (e) {}
   };
 
   // Global Keybindings & Android Back Button (e.g. Esc/Back to close sheets/modals)
