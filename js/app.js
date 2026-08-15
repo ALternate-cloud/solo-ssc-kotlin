@@ -1608,7 +1608,7 @@ function openPenaltyModal() {
    12. HUNTER AUTHENTICATION & AWAKENING UI
    ========================================================================== */
 function initAuthUI() {
-  const auth = window.Auth;
+  const auth = window.AuthClient;
   const authModal = document.getElementById('auth-modal');
   const authBtn = document.getElementById('hud-auth-btn');
   const userPill = document.getElementById('hud-user-pill');
@@ -1645,7 +1645,7 @@ function initAuthUI() {
   if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
       if (auth) auth.logout();
-      showSystemNotification('HUNTER LOGGED OUT', 'You have been disconnected from the Central Guild Cloud.');
+      showSystemNotification('HUNTER LOGGED OUT', 'You have been signed out from the System.');
     });
   }
 
@@ -1696,12 +1696,13 @@ function initAuthUI() {
     registerForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const hunterName = document.getElementById('reg-hunter-name').value.trim();
+      const email = document.getElementById('reg-email') ? document.getElementById('reg-email').value.trim() : '';
       const username = document.getElementById('reg-username').value.trim();
       const password = document.getElementById('reg-password').value;
       const errorDiv = document.getElementById('reg-error-msg');
 
       errorDiv.style.display = 'none';
-      const res = await auth.register(username, password, hunterName);
+      const res = await auth.register(username, password, hunterName, email);
 
       if (res.success) {
         authModal.classList.remove('active');
@@ -1721,6 +1722,13 @@ function initAuthUI() {
 
   if (auth) {
     updateHUDAuthState(Boolean(auth.token), auth.currentUser);
+
+    // Initial Auth Gate: If no user logged in, open Awakening Modal immediately
+    if (!auth.token || !auth.currentUser) {
+      setTimeout(() => {
+        if (authModal) authModal.classList.add('active');
+      }, 350);
+    }
   }
 }
 

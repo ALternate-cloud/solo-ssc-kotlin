@@ -8,8 +8,7 @@ class AuthClientEngine {
     this.currentUser = this.loadSavedUser();
     this.isSyncing = false;
     const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    const isAppOrigin = window.location.origin.startsWith('file:') || window.location.origin.startsWith('capacitor:') || window.location.origin.startsWith('ionic:') || window.location.origin.startsWith('http://localhost');
-    this.apiBase = (!isLocalhost && window.location.origin.includes('onrender.com')) ? window.location.origin : 'https://solo-leveling-ssc.onrender.com';
+    this.apiBase = isLocalhost ? `http://${window.location.hostname}:3000` : 'https://solo-leveling-ssc.onrender.com';
 
     // Check session on load
     if (this.token) {
@@ -40,7 +39,19 @@ class AuthClientEngine {
     this.currentUser = null;
     localStorage.removeItem('solo_system_jwt_token');
     localStorage.removeItem('solo_system_current_user');
+    localStorage.removeItem('solo_leveling_exam_player');
+    localStorage.removeItem('solo_system_daily_quests');
+    localStorage.removeItem('solo_system_shadow_army');
+    if (window.Player && typeof DEFAULT_PLAYER_STATE !== 'undefined') {
+      window.Player.data = JSON.parse(JSON.stringify(DEFAULT_PLAYER_STATE));
+      window.Player.saveState();
+      window.Player.renderAll();
+    }
     this.notifyAuthChange();
+    setTimeout(() => {
+      const authModal = document.getElementById('auth-modal');
+      if (authModal) authModal.classList.add('active');
+    }, 200);
   }
 
   async verifySession() {
@@ -54,6 +65,7 @@ class AuthClientEngine {
           this.currentUser = data.user;
           localStorage.setItem('solo_system_current_user', JSON.stringify(data.user));
           this.notifyAuthChange();
+          this.pullCloudSync();
         }
       } else {
         // Token expired
@@ -65,12 +77,12 @@ class AuthClientEngine {
   }
 
   // 1. REGISTER
-  async register(username, password, hunterName) {
+  async register(username, password, hunterName, email) {
     try {
       const res = await fetch(`${this.apiBase}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password, hunterName })
+        body: JSON.stringify({ username, password, hunterName, email })
       });
 
       const data = await res.json();

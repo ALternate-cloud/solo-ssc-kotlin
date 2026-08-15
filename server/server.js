@@ -72,19 +72,31 @@ class DatabaseEngine {
   }
 
   findUserByUsername(username) {
-    return this.data.users.find(u => u.username.toLowerCase() === username.toLowerCase());
+    if (!username) return null;
+    return this.data.users.find(u => u.username && u.username.toLowerCase() === username.toLowerCase());
+  }
+
+  findUserByUsernameOrEmail(identifier) {
+    if (!identifier) return null;
+    const clean = identifier.toLowerCase().trim();
+    return this.data.users.find(u => 
+      (u.username && u.username.toLowerCase() === clean) || 
+      (u.email && u.email.toLowerCase() === clean)
+    );
   }
 
   findUserById(id) {
     return this.data.users.find(u => u.id === id);
   }
 
-  createUser(username, passwordHash, hunterName) {
+  createUser(username, passwordHash, hunterName, email) {
+    const cleanUser = username.toLowerCase().trim();
     const newUser = {
       id: `usr_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
-      username: username.toLowerCase(),
+      username: cleanUser,
+      email: email ? email.toLowerCase().trim() : `${cleanUser}@solosystem.app`,
       passwordHash,
-      hunterName: hunterName || 'Sung Jin-Aspirant',
+      hunterName: hunterName || username,
       createdAt: new Date().toISOString()
     };
     this.data.users.push(newUser);
@@ -245,7 +257,7 @@ const server = http.createServer((req, res) => {
   if (pathname === '/api/auth/register' && req.method === 'POST') {
     readBody((err, body) => {
       if (err) return sendJson(400, { success: false, message: 'Invalid JSON.' });
-      const { username, password, hunterName } = body;
+      const { username, password, hunterName, email } = body;
 
       if (!username || username.trim().length < 3) {
         return sendJson(400, { success: false, message: 'Username must be at least 3 characters.' });
@@ -254,19 +266,19 @@ const server = http.createServer((req, res) => {
         return sendJson(400, { success: false, message: 'Password must be at least 4 characters.' });
       }
 
-      if (db.findUserByUsername(username)) {
-        return sendJson(400, { success: false, message: 'Hunter already awakened with this username! Please log in.' });
+      if (db.findUserByUsernameOrEmail(username) || (email && db.findUserByUsernameOrEmail(email))) {
+        return sendJson(400, { success: false, message: 'A Hunter already exists with this username or email! Please log in.' });
       }
 
       const pHash = hashPassword(password);
-      const user = db.createUser(username.trim(), pHash, hunterName);
+      const user = db.createUser(username.trim(), pHash, hunterName, email);
       const token = createToken({ id: user.id, username: user.username });
 
       sendJson(200, {
         success: true,
         message: 'Hunter awakened successfully!',
         token,
-        user: { id: user.id, username: user.username, hunterName: user.hunterName }
+        user: { id: user.id, username: user.username, email: user.email, hunterName: user.hunterName }
       });
     });
     return;
@@ -279,12 +291,12 @@ const server = http.createServer((req, res) => {
       const { username, password } = body;
 
       if (!username || !password) {
-        return sendJson(400, { success: false, message: 'Please provide both username and password.' });
+        return sendJson(400, { success: false, message: 'Please provide both your username/email and password.' });
       }
 
-      const user = db.findUserByUsername(username);
+      const user = db.findUserByUsernameOrEmail(username);
       if (!user || !verifyPassword(password, user.passwordHash)) {
-        return sendJson(400, { success: false, message: 'Invalid username or password. Access denied.' });
+        return sendJson(400, { success: false, message: 'Invalid username/email or password. Access denied.' });
       }
 
       const token = createToken({ id: user.id, username: user.username });
@@ -292,7 +304,7 @@ const server = http.createServer((req, res) => {
         success: true,
         message: `Welcome back, ${user.hunterName}!`,
         token,
-        user: { id: user.id, username: user.username, hunterName: user.hunterName }
+        user: { id: user.id, username: user.username, email: user.email, hunterName: user.hunterName }
       });
     });
     return;
