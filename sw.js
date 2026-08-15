@@ -1,6 +1,7 @@
-// Service Worker for Solo Leveling SSC CGL PWA / APK
-const CACHE_NAME = 'solo-leveling-ssc-v4';
+// Service Worker for Solo Leveling SSC CGL PWA / Web APK
+const CACHE_NAME = 'solo-leveling-ssc-v5';
 const OFFLINE_URL = '/offline.html';
+
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -17,8 +18,6 @@ const ASSETS_TO_CACHE = [
   '/icons/icon-512.png',
   '/icons/maskable-icon-192.png',
   '/icons/maskable-icon-512.png',
-  '/icons/screenshot-desktop.png',
-  '/icons/screenshot-mobile.png',
   '/css/system-theme.css',
   '/css/layout.css',
   '/css/components.css',
@@ -38,15 +37,23 @@ const ASSETS_TO_CACHE = [
   '/js/app.js'
 ];
 
+// Install: Cache core assets safely without breaking if one fails
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE).catch((err) => console.warn('Cache warning:', err));
+    caches.open(CACHE_NAME).then(async (cache) => {
+      for (const url of ASSETS_TO_CACHE) {
+        try {
+          await cache.add(url);
+        } catch (err) {
+          console.warn(`[SW] Cache skipped for: ${url}`, err);
+        }
+      }
     })
   );
   self.skipWaiting();
 });
 
+// Activate: Purge old cache versions immediately
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -62,33 +69,49 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
+// Fetch: Safe Network-First for Navigation, Stale-While-Revalidate for Assets
 self.addEventListener('fetch', (event) => {
-  // Always allow API calls to go directly to network
+  // Always let API calls go directly to the server
   if (event.request.url.includes('/api/')) {
     return;
   }
 
-  // If navigating to a page, try network -> cache -> offline fallback
+  // Navigation requests: Network -> Cache -> Offline Fallback
   if (event.request.mode === 'navigate') {
     event.respondWith(
-      fetch(event.request).catch(() => {
-        return caches.match(event.request).then((res) => res || caches.match(OFFLINE_URL));
-      })
+      fetch(event.request)
+        .then((response) => {
+          if (response && response.status === 200) {
+            const responseClone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
+          }
+          return response;
+        })
+        .catch(async () => {
+          const cached = await caches.match(event.request);
+          if (cached) return cached;
+          const indexCached = await caches.match('/index.html');
+          if (indexCached) return indexCached;
+          return caches.match(OFFLINE_URL);
+        })
     );
     return;
   }
 
+  // Static Assets: Stale-While-Revalidate with Safe Fallback
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) {
-        fetch(event.request).then((fresh) => {
-          if (fresh && fresh.status === 200) {
-            caches.open(CACHE_NAME).then((c) => c.put(event.request, fresh));
+    caches.match(event.request).then((cachedResponse) => {
+      const fetchPromise = fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200 && event.request.method === 'GET') {
+            const responseClone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
           }
-        }).catch(() => {});
-        return cached;
-      }
-      return fetch(event.request);
-    }).catch(() => caches.match(OFFLINE_URL))
+          return networkResponse;
+        })
+        .catch(() => null);
+
+      return cachedResponse || fetchPromise || caches.match(OFFLINE_URL);
+    })
   );
 });
