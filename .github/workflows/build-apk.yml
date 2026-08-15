@@ -1,0 +1,50 @@
+name: Build Solo Leveling Android APK
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch: # Allows manual trigger from GitHub Actions tab
+
+jobs:
+  build-apk:
+    name: Build Native Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: ☕ Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: 🐘 Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: 🔧 Grant Execute Permissions for Gradlew
+        run: chmod +x android/gradlew
+
+      - name: 🏗️ Build Debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: 📦 Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SoloLeveling-SSC-Prep-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 30
+
+      - name: 📝 Summary
+        run: |
+          echo "### 🏆 Android APK Build Succeeded!" >> $GITHUB_STEP_SUMMARY
+          echo "You can download the **SoloLeveling-SSC-Prep-APK** from the **Artifacts** section at the bottom of this run summary." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📱 **How to install on your phone:**" >> $GITHUB_STEP_SUMMARY
+          echo "1. Download the \`SoloLeveling-SSC-Prep-APK.zip\` from GitHub Actions." >> $GITHUB_STEP_SUMMARY
+          echo "2. Unzip to get \`app-debug.apk\`." >> $GITHUB_STEP_SUMMARY
+          echo "3. Transfer to your Android phone and tap to install!" >> $GITHUB_STEP_SUMMARY
