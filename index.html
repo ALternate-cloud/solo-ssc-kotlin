@@ -6,6 +6,20 @@
   <title>THE SYSTEM - Solo Leveling Exam Preparation Mobile App</title>
   <meta name="description" content="Gamified Solo Leveling RPG exam preparation system for SSC CGL, CHSL, MTS, and competitive exams. Daily quests, Question Vault, Boss CBT Mocks, and ARISE error extraction.">
   
+  <!-- Global Diagnostic Error Catcher -->
+  <script>
+    window.addEventListener('error', function(e) {
+      var errDiv = document.getElementById('debug-error-banner');
+      if (!errDiv) {
+        errDiv = document.createElement('div');
+        errDiv.id = 'debug-error-banner';
+        errDiv.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#ff0055;color:#fff;font-size:11px;padding:8px 12px;z-index:999999;font-family:monospace;word-break:break-all;box-shadow:0 4px 12px rgba(0,0,0,0.8);';
+        document.documentElement.appendChild(errDiv);
+      }
+      errDiv.textContent = '⚠️ SCRIPT ERROR: ' + (e.message || e) + ' (Line ' + (e.lineno || '?') + ')';
+    });
+  </script>
+  
   <!-- Mobile & PWA App Metadata -->
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
