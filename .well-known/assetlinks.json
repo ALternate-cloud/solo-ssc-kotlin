@@ -1,0 +1,13 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.sololeveling.sscprep",
+      "sha256_cert_fingerprints": [
+        "14:6D:E9:7C:F5:F4:AB:70:2D:B7:8B:25:7A:B2:D6:7F:C2:59:B9:9E:2D:58:3B:56:5B:45:9F:8E:22:98:A2:3E",
+        "FA:C6:17:45:DC:09:03:78:6F:B9:ED:E6:2A:96:2B:39:9F:73:48:F0:BB:6F:89:9B:83:32:66:75:91:03:3B:9C"
+      ]
+    }
+  }
+]
