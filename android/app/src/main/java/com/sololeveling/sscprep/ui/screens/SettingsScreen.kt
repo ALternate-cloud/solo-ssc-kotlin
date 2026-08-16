@@ -199,7 +199,7 @@ fun SettingsScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text("Version", color = TextSecondary)
-                Text("1.1.0 (Build 2)", color = SystemPrimary, fontWeight = FontWeight.Bold)
+                Text("${com.sololeveling.sscprep.BuildConfig.VERSION_NAME} (Build ${com.sololeveling.sscprep.BuildConfig.VERSION_CODE})", color = SystemPrimary, fontWeight = FontWeight.Bold)
             }
             Spacer(modifier = Modifier.height(6.dp))
             Row(

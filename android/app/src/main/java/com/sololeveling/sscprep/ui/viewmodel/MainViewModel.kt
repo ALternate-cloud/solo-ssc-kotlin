@@ -67,7 +67,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val countdownToMidnight: StateFlow<String> = _countdownToMidnight.asStateFlow()
 
     // App Update state (non-forced)
-    private val currentVersionCode = 1
+    private val currentVersionCode = com.sololeveling.sscprep.BuildConfig.VERSION_CODE
     private val _appUpdateInfo = MutableStateFlow<com.sololeveling.sscprep.network.AppVersionResponse?>(null)
     val appUpdateInfo: StateFlow<com.sololeveling.sscprep.network.AppVersionResponse?> = _appUpdateInfo.asStateFlow()
 
