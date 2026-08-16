@@ -257,10 +257,10 @@ const server = http.createServer((req, res) => {
   if (pathname === '/api/version' && req.method === 'GET') {
     return sendJson(200, {
       success: true,
-      latestVersionCode: 1,
-      latestVersionName: "1.0.0",
+      latestVersionCode: 2,
+      latestVersionName: "1.1.0",
       downloadUrl: "https://github.com/ALternate-cloud/solo-ssc-kotlin/actions",
-      changelog: "• Online Multiplayer & Hunter Cloud Sync\n• Live National Leaderboard Rankings\n• SSC CGL 2025 Tier-2 PYQ Mock Raids\n• Shadow Mistake Extraction (ARISE)\n• Pomodoro Focus Sanctum"
+      changelog: "• Added System Settings Menu with Sound & Haptic controls\n• Added Permanent Account Deletion\n• Hunter Cloud Auto-Sync Optimizations"
     });
   }
 
@@ -336,6 +336,27 @@ const server = http.createServer((req, res) => {
     return sendJson(200, {
       success: true,
       user: { id: user.id, username: user.username, hunterName: user.hunterName }
+    });
+  }
+
+  // 3.5 AUTH: DELETE ACCOUNT (/api/auth/delete-account)
+  if ((pathname === '/api/auth/delete-account' || pathname === '/api/auth/delete') && (req.method === 'POST' || req.method === 'DELETE')) {
+    const authUser = extractAuthUser(req);
+    if (!authUser) return sendJson(401, { success: false, message: 'Unauthorized. Please log in again.' });
+
+    const userId = authUser.id;
+    db.data.users = db.data.users.filter(u => u.id !== userId);
+    delete db.data.playerProgress[userId];
+    delete db.data.dailyQuests[userId];
+    delete db.data.shadowArmy[userId];
+    if (db.data.mockAttempts) {
+      db.data.mockAttempts = db.data.mockAttempts.filter(m => m.userId !== userId);
+    }
+    db.save();
+
+    return sendJson(200, {
+      success: true,
+      message: 'Hunter account and all cloud records have been permanently purged.'
     });
   }
 

@@ -102,6 +102,22 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         _authState.value = AuthState.LoggedOut
     }
 
+    fun deleteAccount(onSuccess: () -> Unit = {}, onError: (String) -> Unit = {}) {
+        viewModelScope.launch {
+            try {
+                val response = authRepo.deleteAccount()
+                if (response.success) {
+                    _authState.value = AuthState.LoggedOut
+                    onSuccess()
+                } else {
+                    onError(response.message.ifBlank { "Could not delete account." })
+                }
+            } catch (e: Exception) {
+                onError(extractErrorMessage(e))
+            }
+        }
+    }
+
     fun clearError() {
         if (_authState.value is AuthState.Error) {
             _authState.value = AuthState.LoggedOut

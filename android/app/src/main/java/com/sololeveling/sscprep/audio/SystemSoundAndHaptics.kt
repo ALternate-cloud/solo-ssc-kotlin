@@ -15,6 +15,16 @@ import kotlin.math.sin
 
 class SystemSoundAndHaptics(private val context: Context) {
 
+    private val prefs = context.getSharedPreferences("solo_audio_prefs", Context.MODE_PRIVATE)
+
+    var isSoundEnabled: Boolean
+        get() = prefs.getBoolean("sound_enabled", true)
+        set(value) = prefs.edit().putBoolean("sound_enabled", value).apply()
+
+    var isHapticsEnabled: Boolean
+        get() = prefs.getBoolean("haptics_enabled", true)
+        set(value) = prefs.edit().putBoolean("haptics_enabled", value).apply()
+
     private val vibrator: Vibrator? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         val vibratorManager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as? VibratorManager
         vibratorManager?.defaultVibrator
@@ -26,6 +36,7 @@ class SystemSoundAndHaptics(private val context: Context) {
     private val audioScope = CoroutineScope(Dispatchers.Default)
 
     fun triggerHaptic(type: String = "light") {
+        if (!isHapticsEnabled) return
         try {
             if (vibrator == null || !vibrator.hasVibrator()) return
 
@@ -90,6 +101,7 @@ class SystemSoundAndHaptics(private val context: Context) {
     }
 
     private fun playTone(frequency: Double, durationMs: Int, volume: Float) {
+        if (!isSoundEnabled) return
         try {
             val sampleRate = 44100
             val numSamples = (sampleRate * (durationMs / 1000.0)).toInt()

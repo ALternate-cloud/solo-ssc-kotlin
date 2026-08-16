@@ -55,4 +55,12 @@ class AuthRepository(context: Context) {
     fun logout() {
         prefs.edit().clear().apply()
     }
+
+    suspend fun deleteAccount(): AuthResponse {
+        val response = ApiClient.apiService.deleteAccount()
+        if (response.success) {
+            logout()
+        }
+        return response
+    }
 }

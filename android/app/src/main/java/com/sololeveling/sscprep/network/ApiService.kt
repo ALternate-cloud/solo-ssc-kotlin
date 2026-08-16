@@ -25,4 +25,7 @@ interface ApiService {
 
     @GET("api/version")
     suspend fun checkAppVersion(): AppVersionResponse
+
+    @POST("api/auth/delete-account")
+    suspend fun deleteAccount(): AuthResponse
 }

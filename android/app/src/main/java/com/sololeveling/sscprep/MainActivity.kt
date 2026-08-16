@@ -90,6 +90,7 @@ class MainActivity : ComponentActivity() {
                     is AuthState.LoggedIn -> {
                         MainAppScaffold(
                             viewModel = viewModel,
+                            authViewModel = authViewModel,
                             onLogout = { authViewModel.logout() }
                         )
                     }
@@ -101,7 +102,11 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainAppScaffold(viewModel: MainViewModel, onLogout: () -> Unit = {}) {
+fun MainAppScaffold(
+    viewModel: MainViewModel,
+    authViewModel: AuthViewModel,
+    onLogout: () -> Unit = {}
+) {
     var currentScreen by remember { mutableStateOf("status") }
     var showGuildDrawer by remember { mutableStateOf(false) }
 
@@ -243,6 +248,11 @@ fun MainAppScaffold(viewModel: MainViewModel, onLogout: () -> Unit = {}) {
                 "shop" -> ShopScreen(viewModel = viewModel)
                 "syllabus" -> SyllabusScreen()
                 "leaderboard" -> LeaderboardScreen(viewModel = viewModel)
+                "settings" -> SettingsScreen(
+                    viewModel = viewModel,
+                    authViewModel = authViewModel,
+                    onAccountDeleted = { onLogout() }
+                )
             }
 
             // System Alert Notification Banner
@@ -322,7 +332,12 @@ fun MainAppScaffold(viewModel: MainViewModel, onLogout: () -> Unit = {}) {
                     showGuildDrawer = false
                 }
 
-                GuildMenuItem("Check for Updates", "⚡", "Check for new questions & patches", SystemPrimary) {
+                GuildMenuItem("System Settings", "⚙️", "Audio, haptics & account controls", SystemPrimary) {
+                    currentScreen = "settings"
+                    showGuildDrawer = false
+                }
+
+                GuildMenuItem("Check for Updates", "⚡", "Check for new questions & patches", SystemPurple) {
                     showGuildDrawer = false
                     viewModel.checkForUpdates(manual = true)
                 }
