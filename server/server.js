@@ -63,8 +63,9 @@ class DatabaseEngine {
     try {
       const { MongoClient } = require('mongodb');
       const client = new MongoClient(uri, { 
-        serverSelectionTimeoutMS: 8000,
-        connectTimeoutMS: 10000 
+        serverSelectionTimeoutMS: 10000,
+        connectTimeoutMS: 10000,
+        family: 4
       });
       await client.connect();
       mongoDbInstance = client.db('solosystem');
