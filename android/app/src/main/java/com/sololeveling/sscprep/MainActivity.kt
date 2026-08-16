@@ -88,6 +88,17 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                     is AuthState.LoggedIn -> {
+                        val loggedIn = authState as AuthState.LoggedIn
+                        LaunchedEffect(loggedIn) {
+                            val targetName = loggedIn.hunterName.ifBlank { loggedIn.username }
+                            if (targetName.isNotBlank() && targetName != "Hunter") {
+                                viewModel.setPlayerName(targetName)
+                            } else if (loggedIn.username.isNotBlank()) {
+                                viewModel.setPlayerName(loggedIn.username)
+                            }
+                            viewModel.pullAndApplyCloudState()
+                        }
+
                         MainAppScaffold(
                             viewModel = viewModel,
                             authViewModel = authViewModel,

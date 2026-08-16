@@ -146,6 +146,7 @@ class DatabaseEngine {
 
     // Initial player state
     this.data.playerProgress[newUser.id] = {
+      name: newUser.hunterName,
       level: 1,
       exp: 0,
       maxExp: 100,
@@ -300,10 +301,10 @@ const server = http.createServer((req, res) => {
   if (pathname === '/api/version' && req.method === 'GET') {
     return sendJson(200, {
       success: true,
-      latestVersionCode: 2,
-      latestVersionName: "1.1.0",
+      latestVersionCode: 3,
+      latestVersionName: "1.2.0",
       downloadUrl: "https://github.com/ALternate-cloud/solo-ssc-kotlin/releases/download/latest/app-debug.apk",
-      changelog: "• Added System Settings Menu with Sound & Haptic controls\n• Added Permanent Account Deletion\n• Hunter Cloud Auto-Sync Optimizations"
+      changelog: "• Personalized Hunter Profile: Displays your registered username\n• Auto-sync Hunter Name across all Status & Leaderboard screens\n• Enhanced System Performance"
     });
   }
 
@@ -460,7 +461,118 @@ const server = http.createServer((req, res) => {
 
   // 7. LEADERBOARD GET
   if (pathname === '/api/leaderboard' && req.method === 'GET') {
-    const leaderboard = db.data.users.map(u => {
+    const LEGENDARY_HUNTERS = [
+      {
+        userId: 'monarch_sung_jinwoo',
+        hunterName: 'Sung Jin-Woo (Shadow Monarch)',
+        level: 85,
+        exp: 4500,
+        rank: 'Monarch',
+        title: 'The Sovereign of Shadows',
+        targetPostId: 'cbi',
+        gold: 50000,
+        totalQuestionsSolved: 3840,
+        mockTestsCleared: 82
+      },
+      {
+        userId: 'monarch_thomas_andre',
+        hunterName: 'Thomas Andre (Goliath)',
+        level: 72,
+        exp: 3100,
+        rank: 'S',
+        title: 'National Level Aspirant',
+        targetPostId: 'iti',
+        gold: 32000,
+        totalQuestionsSolved: 2950,
+        mockTestsCleared: 64
+      },
+      {
+        userId: 'monarch_liu_zhigang',
+        hunterName: 'Liu Zhigang (Blade Hero)',
+        level: 65,
+        exp: 2800,
+        rank: 'S',
+        title: 'Dragon Slayer of Quantitative Aptitude',
+        targetPostId: 'ed',
+        gold: 24000,
+        totalQuestionsSolved: 2420,
+        mockTestsCleared: 53
+      },
+      {
+        userId: 'monarch_cha_haein',
+        hunterName: 'Cha Hae-In (Sword Dancer)',
+        level: 58,
+        exp: 2100,
+        rank: 'S',
+        title: 'The Radiant Hunter',
+        targetPostId: 'mea',
+        gold: 18500,
+        totalQuestionsSolved: 1980,
+        mockTestsCleared: 45
+      },
+      {
+        userId: 'monarch_choi_jongin',
+        hunterName: 'Choi Jong-In (Ultimate Mage)',
+        level: 49,
+        exp: 1600,
+        rank: 'A',
+        title: 'Master of Logical Reasoning',
+        targetPostId: 'gst',
+        gold: 14200,
+        totalQuestionsSolved: 1640,
+        mockTestsCleared: 38
+      },
+      {
+        userId: 'monarch_baek_yoonho',
+        hunterName: 'Baek Yoon-Ho (White Tiger)',
+        level: 42,
+        exp: 1200,
+        rank: 'A',
+        title: 'Beast Transformation Math Master',
+        targetPostId: 'da',
+        gold: 11000,
+        totalQuestionsSolved: 1350,
+        mockTestsCleared: 31
+      },
+      {
+        userId: 'monarch_woo_jinchul',
+        hunterName: 'Woo Jin-Chul (Association Chief)',
+        level: 35,
+        exp: 800,
+        rank: 'A',
+        title: 'Inspector of Discipline',
+        targetPostId: 'cag',
+        gold: 8500,
+        totalQuestionsSolved: 1040,
+        mockTestsCleared: 24
+      },
+      {
+        userId: 'monarch_min_byunggyu',
+        hunterName: 'Min Byung-Gyu (Saint Healer)',
+        level: 28,
+        exp: 550,
+        rank: 'B',
+        title: 'Negative Marking Restorer',
+        targetPostId: 'po',
+        gold: 6200,
+        totalQuestionsSolved: 790,
+        mockTestsCleared: 18
+      },
+      {
+        userId: 'monarch_yoo_jinho',
+        hunterName: 'Yoo Jin-Ho (Vice Guild Master)',
+        level: 18,
+        exp: 300,
+        rank: 'C',
+        title: 'Rich Boy Aspirant',
+        targetPostId: 'iti',
+        gold: 35000,
+        totalQuestionsSolved: 450,
+        mockTestsCleared: 10
+      }
+    ];
+
+    const realUsers = db.data.users.map(u => {
       const p = db.data.playerProgress[u.id] || { level: 1, exp: 0, rank: 'E', title: 'Aspirant', statsUnlocked: {} };
       return {
         userId: u.id,
@@ -474,10 +586,18 @@ const server = http.createServer((req, res) => {
         totalQuestionsSolved: (p.statsUnlocked && p.statsUnlocked.totalQuestionsSolved) || 0,
         mockTestsCleared: (p.statsUnlocked && p.statsUnlocked.mockTestsCleared) || 0
       };
-    }).sort((a, b) => b.level - a.level || b.exp - a.exp).slice(0, 50).map((item, idx) => ({
-      ...item,
-      rankPosition: idx + 1
-    }));
+    });
+
+    // Merge real users with legendary NPC hunter rivals
+    const combined = [...realUsers, ...LEGENDARY_HUNTERS];
+
+    const leaderboard = combined
+      .sort((a, b) => (b.level - a.level) || (b.exp - a.exp) || (b.totalQuestionsSolved - a.totalQuestionsSolved))
+      .slice(0, 50)
+      .map((item, idx) => ({
+        ...item,
+        rankPosition: idx + 1
+      }));
 
     return sendJson(200, { success: true, leaderboard });
   }
