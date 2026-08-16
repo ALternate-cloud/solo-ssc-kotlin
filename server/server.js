@@ -602,8 +602,15 @@ const server = http.createServer((req, res) => {
     return sendJson(200, { success: true, leaderboard });
   }
 
-  // 8. ADMIN: GET ALL ASPIRANTS ROSTER
+  // 8. ADMIN: GET ALL ASPIRANTS ROSTER (Protected)
+  const ADMIN_MASTER_KEY = process.env.ADMIN_KEY || 'monarch2026';
+
   if (pathname === '/api/admin/aspirants' && req.method === 'GET') {
+    const key = req.headers['x-admin-key'] || parsedUrl.searchParams.get('key');
+    if (key !== ADMIN_MASTER_KEY) {
+      return sendJson(401, { success: false, message: 'Access Denied: Invalid Monarch Master Key.' });
+    }
+
     const aspirants = db.data.users.map(u => {
       const p = db.data.playerProgress[u.id] || {};
       const q = db.data.dailyQuests[u.id] || {};
@@ -613,11 +620,13 @@ const server = http.createServer((req, res) => {
       return {
         userId: u.id,
         username: u.username,
+        email: u.email || 'N/A',
         hunterName: u.hunterName || u.username,
         createdAt: u.createdAt,
         level: p.level || 1,
         rank: p.rank || 'E',
         exp: p.exp || 0,
+        gold: p.gold || 0,
         targetPostId: p.targetPostId || 'iti',
         stats: p.stats || { int: 10, vit: 10, agi: 10, sen: 10, str: 10 },
         totalQuestionsSolved: stats.totalQuestionsSolved || 0,
@@ -645,10 +654,15 @@ const server = http.createServer((req, res) => {
     });
   }
 
-  // 9. ADMIN: EXPORT CSV ROSTER
+  // 9. ADMIN: EXPORT CSV ROSTER (Protected)
   if (pathname === '/api/admin/export-csv' && req.method === 'GET') {
+    const key = parsedUrl.searchParams.get('key');
+    if (key !== ADMIN_MASTER_KEY) {
+      return sendJson(401, { success: false, message: 'Access Denied: Invalid Monarch Master Key.' });
+    }
+
     const rows = [
-      ['Hunter Name', 'Username', 'Level', 'Rank', 'Target CGL Post', 'Questions Solved', 'Mocks Cleared', 'Study Streak (Days)', 'Focus Minutes', 'Registered Date']
+      ['Hunter Name', 'Username', 'Email', 'Level', 'Rank', 'Target CGL Post', 'Questions Solved', 'Mocks Cleared', 'Study Streak (Days)', 'Focus Minutes', 'Registered Date']
     ];
 
     db.data.users.forEach(u => {
@@ -658,6 +672,7 @@ const server = http.createServer((req, res) => {
       rows.push([
         `"${(u.hunterName || u.username).replace(/"/g, '""')}"`,
         `"${u.username}"`,
+        `"${u.email || ''}"`,
         p.level || 1,
         p.rank || 'E',
         `"${p.targetPostId || 'iti'}"`,
@@ -672,9 +687,184 @@ const server = http.createServer((req, res) => {
     const csvContent = rows.map(r => r.join(',')).join('\n');
     res.writeHead(200, {
       'Content-Type': 'text/csv; charset=utf-8',
-      'Content-Disposition': 'attachment; filename="SSC_CGL_Aspirants_Roster.csv"'
+      'Content-Disposition': 'attachment; filename="SoloLeveling_Aspirants_Roster.csv"'
     });
     res.end(csvContent);
+    return;
+  }
+
+  // 10. ADMIN: WEB DASHBOARD HTML PORTAL (Password Protected)
+  if (pathname === '/admin' && req.method === 'GET') {
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solo Leveling SSC - Monarch Admin Portal</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background: #060b13; color: #e2e8f0; padding: 24px; min-height: 100vh; }
+    .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 16px; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+    .logo { color: #00d2ff; font-size: 22px; font-weight: 900; letter-spacing: 2px; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .stat-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 16px; }
+    .stat-label { color: #94a3b8; font-size: 12px; font-weight: 600; text-transform: uppercase; }
+    .stat-val { color: #00d2ff; font-size: 28px; font-weight: bold; margin-top: 4px; }
+    .controls { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+    .search-box { background: #0f172a; border: 1px solid #334155; color: #fff; padding: 8px 14px; border-radius: 6px; flex: 1; min-width: 200px; }
+    .btn { background: #00d2ff; color: #060b13; font-weight: bold; padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; }
+    .btn:hover { background: #38bdf8; }
+    .table-wrap { overflow-x: auto; background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th { background: #1e293b; color: #cbd5e1; padding: 12px 14px; font-size: 13px; text-transform: uppercase; }
+    td { padding: 12px 14px; border-bottom: 1px solid #1e293b; font-size: 14px; }
+    tr:hover td { background: #1e293b55; }
+    .badge { padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; }
+    .badge-rank { background: #8b5cf622; color: #c084fc; border: 1px solid #a855f7; }
+    
+    /* Login Modal */
+    #auth-overlay { position: fixed; inset: 0; background: #060b13fa; display: flex; align-items: center; justify-content: center; z-index: 1000; }
+    .auth-box { background: #0f172a; border: 1px solid #00d2ff; border-radius: 12px; padding: 32px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 0 30px #00d2ff33; }
+    .auth-title { color: #00d2ff; font-size: 20px; font-weight: bold; margin-bottom: 8px; letter-spacing: 1px; }
+    .auth-desc { color: #94a3b8; font-size: 13px; margin-bottom: 20px; }
+    .auth-input { width: 100%; padding: 12px; background: #1e293b; border: 1px solid #334155; border-radius: 6px; color: #fff; font-size: 16px; margin-bottom: 16px; text-align: center; }
+  </style>
+</head>
+<body>
+
+  <!-- Password Protection Modal -->
+  <div id="auth-overlay">
+    <div class="auth-box">
+      <div style="font-size: 40px; margin-bottom: 12px;">🛡️</div>
+      <div class="auth-title">MONARCH MASTER ACCESS</div>
+      <div class="auth-desc">Enter your secret Master Key to view player data and analytics.</div>
+      <input type="password" id="key-input" class="auth-input" placeholder="Enter Master Key" onkeypress="if(event.key==='Enter') unlockPortal()">
+      <div id="auth-err" style="color: #ef4444; font-size: 13px; margin-bottom: 12px; display: none;">Invalid Master Key! Access Denied.</div>
+      <button onclick="unlockPortal()" class="btn" style="width: 100%; justify-content: center; padding: 12px;">ENTER PORTAL 👑</button>
+    </div>
+  </div>
+
+  <div class="header">
+    <div class="logo">⚡ MONARCH ADMIN SYSTEM</div>
+    <div style="display: flex; gap: 8px;">
+      <a id="csv-link" href="#" class="btn">📥 Export to Excel / CSV</a>
+      <button onclick="logoutAdmin()" class="btn" style="background: #334155; color: #fff;">🔒 Lock</button>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-label">Total Hunters</div><div class="stat-val" id="stat-total">-</div></div>
+    <div class="stat-card"><div class="stat-label">Total Questions Solved</div><div class="stat-val" id="stat-solved">-</div></div>
+    <div class="stat-card"><div class="stat-label">Mock Tests Cleared</div><div class="stat-val" id="stat-mocks">-</div></div>
+    <div class="stat-card"><div class="stat-label">Avg Hunter Level</div><div class="stat-val" id="stat-level">-</div></div>
+  </div>
+
+  <div class="controls">
+    <input type="text" id="search" class="search-box" placeholder="Search by username, email, or hunter name..." onkeyup="renderTable()">
+    <button onclick="loadData()" class="btn" style="background:#334155; color:#fff;">🔄 Refresh</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Hunter Name</th>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Level & Rank</th>
+          <th>Questions</th>
+          <th>Mocks</th>
+          <th>Streak</th>
+          <th>Registered</th>
+        </tr>
+      </thead>
+      <tbody id="tbody">
+        <tr><td colspan="9" style="text-align:center; padding:30px;">Loading hunter database...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    let currentKey = sessionStorage.getItem('monarch_admin_key') || '';
+    let allAspirants = [];
+
+    if (currentKey) {
+      document.getElementById('auth-overlay').style.display = 'none';
+      loadData();
+    }
+
+    function unlockPortal() {
+      const key = document.getElementById('key-input').value.trim();
+      if (!key) return;
+      currentKey = key;
+      sessionStorage.setItem('monarch_admin_key', key);
+      loadData();
+    }
+
+    function logoutAdmin() {
+      sessionStorage.removeItem('monarch_admin_key');
+      location.reload();
+    }
+
+    async function loadData() {
+      try {
+        const res = await fetch('/api/admin/aspirants', {
+          headers: { 'x-admin-key': currentKey }
+        });
+        const data = await res.json();
+        if (data.success) {
+          document.getElementById('auth-overlay').style.display = 'none';
+          document.getElementById('csv-link').href = '/api/admin/export-csv?key=' + encodeURIComponent(currentKey);
+          allAspirants = data.aspirants || [];
+          document.getElementById('stat-total').textContent = data.stats.totalAspirants;
+          document.getElementById('stat-solved').textContent = data.stats.totalSolved;
+          document.getElementById('stat-mocks').textContent = data.stats.totalMocks;
+          document.getElementById('stat-level').textContent = data.stats.avgLevel;
+          renderTable();
+        } else {
+          sessionStorage.removeItem('monarch_admin_key');
+          document.getElementById('auth-overlay').style.display = 'flex';
+          document.getElementById('auth-err').style.display = 'block';
+        }
+      } catch(e) {
+        document.getElementById('tbody').innerHTML = '<tr><td colspan="9" style="color:#ef4444;text-align:center;">Network error.</td></tr>';
+      }
+    }
+
+    function renderTable() {
+      const q = (document.getElementById('search').value || '').toLowerCase();
+      const filtered = allAspirants.filter(a => 
+        (a.hunterName && a.hunterName.toLowerCase().includes(q)) ||
+        (a.username && a.username.toLowerCase().includes(q)) ||
+        (a.email && a.email.toLowerCase().includes(q))
+      );
+
+      const tbody = document.getElementById('tbody');
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:#94a3b8;">No hunters found.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filtered.map((u, i) => \`
+        <tr>
+          <td>\${i + 1}</td>
+          <td style="font-weight:bold; color:#00d2ff;">\${u.hunterName || u.username}</td>
+          <td>\${u.username}</td>
+          <td style="color:#94a3b8;">\${u.email || '-'}</td>
+          <td><span class="badge badge-rank">Rank \${u.rank}</span> <strong>Lv. \${u.level}</strong></td>
+          <td>\${u.totalQuestionsSolved || 0}</td>
+          <td>\${u.mockTestsCleared || 0}</td>
+          <td>🔥 \${u.streakDays || 1}d</td>
+          <td style="font-size:12px; color:#64748b;">\${u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '-'}</td>
+        </tr>
+      \`).join('');
+    }
+  </script>
+</body>
+</html>`;
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.end(html);
     return;
   }
 
