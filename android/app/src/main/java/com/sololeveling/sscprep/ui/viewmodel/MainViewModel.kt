@@ -171,10 +171,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 sense = current.stats.sense + 100,
                 strength = current.stats.strength + 100
             ),
-            statsUnlocked = current.statsUnlocked.copy(
-                totalQuestionsSolved = maxOf(current.statsUnlocked.totalQuestionsSolved, 5000),
-                mockTestsCleared = maxOf(current.statsUnlocked.mockTestsCleared, 100),
-                shadowsExtracted = maxOf(current.statsUnlocked.shadowsExtracted, 50)
+            milestones = current.milestones.copy(
+                totalQuestionsSolved = maxOf(current.milestones.totalQuestionsSolved, 5000),
+                mockTestsCleared = maxOf(current.milestones.mockTestsCleared, 100),
+                shadowsExtracted = maxOf(current.milestones.shadowsExtracted, 50)
             )
         )
         repository.updatePlayerState(boosted)
