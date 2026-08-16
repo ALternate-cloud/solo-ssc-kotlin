@@ -49,7 +49,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                     _authState.value = AuthState.Error(response.message ?: "Login failed")
                 }
             } catch (e: Exception) {
-                _authState.value = AuthState.Error(e.message ?: "Network error occurred")
+                _authState.value = AuthState.Error(extractErrorMessage(e))
             }
         }
     }
@@ -62,12 +62,39 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 if (response.success && response.user != null) {
                     _authState.value = AuthState.LoggedIn(response.user.username, response.user.hunterName ?: hunterName)
                 } else {
-                    _authState.value = AuthState.Error(response.message ?: "Registration failed")
+                    _authState.value = AuthState.Error(response.message.ifBlank { "Registration failed" })
                 }
             } catch (e: Exception) {
-                _authState.value = AuthState.Error(e.message ?: "Network error occurred")
+                _authState.value = AuthState.Error(extractErrorMessage(e))
             }
         }
+    }
+
+    private fun extractErrorMessage(e: Exception): String {
+        if (e is retrofit2.HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            if (!errorBody.isNullOrBlank()) {
+                try {
+                    val json = kotlinx.serialization.json.Json { ignoreUnknownKeys = true; isLenient = true }
+                    val errorObj = json.decodeFromString<com.sololeveling.sscprep.network.AuthResponse>(errorBody)
+                    if (!errorObj.message.isNullOrBlank()) {
+                        return errorObj.message
+                    }
+                } catch (_: Exception) {}
+            }
+            return when (e.code()) {
+                400 -> "Invalid credentials. If you haven't created an account yet, please tap 'Awaken Here' below!"
+                401 -> "Invalid username or password. Access denied."
+                404 -> "Account not found. Please register first."
+                500, 502, 503 -> "Server is starting up on Render. Please retry in 10-15 seconds!"
+                else -> "Server response error (HTTP ${e.code()})"
+            }
+        }
+        val msg = e.localizedMessage ?: e.message ?: ""
+        if (msg.contains("Unable to resolve host") || msg.contains("Failed to connect") || msg.contains("timeout")) {
+            return "Connecting to server... (Render free instances take ~15s to wake up on first request). Please retry in a moment!"
+        }
+        return if (msg.isNotBlank() && !msg.startsWith("HTTP")) msg else "Authentication failed. Please check your credentials or register first."
     }
 
     fun logout() {

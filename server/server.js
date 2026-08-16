@@ -267,18 +267,18 @@ const server = http.createServer((req, res) => {
   // 1. AUTH: REGISTER
   if (pathname === '/api/auth/register' && req.method === 'POST') {
     readBody((err, body) => {
-      if (err) return sendJson(400, { success: false, message: 'Invalid JSON.' });
+      if (err) return sendJson(200, { success: false, message: 'Invalid request format.' });
       const { username, password, hunterName, email } = body;
 
       if (!username || username.trim().length < 3) {
-        return sendJson(400, { success: false, message: 'Username must be at least 3 characters.' });
+        return sendJson(200, { success: false, message: 'Username must be at least 3 characters.' });
       }
       if (!password || password.length < 4) {
-        return sendJson(400, { success: false, message: 'Password must be at least 4 characters.' });
+        return sendJson(200, { success: false, message: 'Password must be at least 4 characters.' });
       }
 
       if (db.findUserByUsernameOrEmail(username) || (email && db.findUserByUsernameOrEmail(email))) {
-        return sendJson(400, { success: false, message: 'A Hunter already exists with this username or email! Please log in.' });
+        return sendJson(200, { success: false, message: 'A Hunter with this username or email already exists. Please log in.' });
       }
 
       const pHash = hashPassword(password);
@@ -298,16 +298,20 @@ const server = http.createServer((req, res) => {
   // 2. AUTH: LOGIN
   if (pathname === '/api/auth/login' && req.method === 'POST') {
     readBody((err, body) => {
-      if (err) return sendJson(400, { success: false, message: 'Invalid JSON.' });
+      if (err) return sendJson(200, { success: false, message: 'Invalid request format.' });
       const { username, password } = body;
 
       if (!username || !password) {
-        return sendJson(400, { success: false, message: 'Please provide both your username/email and password.' });
+        return sendJson(200, { success: false, message: 'Please enter both your username/email and password.' });
       }
 
       const user = db.findUserByUsernameOrEmail(username);
-      if (!user || !verifyPassword(password, user.passwordHash)) {
-        return sendJson(400, { success: false, message: 'Invalid username/email or password. Access denied.' });
+      if (!user) {
+        return sendJson(200, { success: false, message: 'No Hunter account found with this username/email. Please tap "Awaken Here" to register first!' });
+      }
+
+      if (!verifyPassword(password, user.passwordHash)) {
+        return sendJson(200, { success: false, message: 'Incorrect password. Access denied.' });
       }
 
       const token = createToken({ id: user.id, username: user.username });
