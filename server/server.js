@@ -773,14 +773,14 @@ const server = http.createServer((req, res) => {
 
   <!-- Password Protection Modal -->
   <div id="auth-overlay">
-    <div class="auth-box">
+    <form class="auth-box" onsubmit="event.preventDefault(); unlockPortal();">
       <div style="font-size: 40px; margin-bottom: 12px;">🛡️</div>
       <div class="auth-title">MONARCH MASTER ACCESS</div>
-      <div class="auth-desc">Enter your secret Master Key to view player data and analytics.</div>
-      <input type="password" id="key-input" class="auth-input" placeholder="Enter Master Key" onkeypress="if(event.key==='Enter') unlockPortal()">
+      <div class="auth-desc">Enter your secret Master Key (or add <code>?key=...</code> to URL).</div>
+      <input type="text" id="key-input" class="auth-input" placeholder="Enter Master Key (e.g. monarch2026)" autocomplete="off" autocorrect="off" autocapitalize="off">
       <div id="auth-err" style="color: #ef4444; font-size: 13px; margin-bottom: 12px; display: none;">Invalid Master Key! Access Denied.</div>
-      <button onclick="unlockPortal()" class="btn" style="width: 100%; justify-content: center; padding: 12px;">ENTER PORTAL 👑</button>
-    </div>
+      <button type="submit" id="enter-btn" class="btn" style="width: 100%; justify-content: center; padding: 12px;">ENTER PORTAL 👑</button>
+    </form>
   </div>
 
   <div class="header">
@@ -826,11 +826,13 @@ const server = http.createServer((req, res) => {
   </div>
 
   <script>
-    let currentKey = sessionStorage.getItem('monarch_admin_key') || '';
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlKey = urlParams.get('key');
+    let currentKey = urlKey || sessionStorage.getItem('monarch_admin_key') || '';
     let allAspirants = [];
 
     if (currentKey) {
-      document.getElementById('auth-overlay').style.display = 'none';
+      document.getElementById('key-input').value = currentKey;
       loadData();
     }
 
@@ -839,18 +841,20 @@ const server = http.createServer((req, res) => {
       if (!key) return;
       currentKey = key;
       sessionStorage.setItem('monarch_admin_key', key);
+      const btn = document.getElementById('enter-btn');
+      if (btn) btn.textContent = 'Verifying... ⏳';
       loadData();
     }
 
     function logoutAdmin() {
       sessionStorage.removeItem('monarch_admin_key');
-      location.reload();
+      window.location.href = '/admin';
     }
 
     async function boostUser(userId, name) {
       if (!confirm('⚡ Activate Developer God Mode for ' + name + '?\n\n• Level 100\n• Monarch Rank\n• 999,999 Gold\n• 500 Stat Points')) return;
       try {
-        const res = await fetch('/api/admin/god-mode', {
+        const res = await fetch('/api/admin/god-mode?key=' + encodeURIComponent(currentKey), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'x-admin-key': currentKey },
           body: JSON.stringify({ userId, level: 100, rank: 'Monarch', gold: 999999, unallocatedPoints: 500, title: 'The Architect of the System' })
@@ -864,8 +868,10 @@ const server = http.createServer((req, res) => {
     }
 
     async function loadData() {
+      const errEl = document.getElementById('auth-err');
+      const btn = document.getElementById('enter-btn');
       try {
-        const res = await fetch('/api/admin/aspirants', {
+        const res = await fetch('/api/admin/aspirants?key=' + encodeURIComponent(currentKey), {
           headers: { 'x-admin-key': currentKey }
         });
         const data = await res.json();
@@ -881,10 +887,12 @@ const server = http.createServer((req, res) => {
         } else {
           sessionStorage.removeItem('monarch_admin_key');
           document.getElementById('auth-overlay').style.display = 'flex';
-          document.getElementById('auth-err').style.display = 'block';
+          if (errEl) errEl.style.display = 'block';
+          if (btn) btn.textContent = 'ENTER PORTAL 👑';
         }
       } catch(e) {
-        document.getElementById('tbody').innerHTML = '<tr><td colspan="10" style="color:#ef4444;text-align:center;">Network error.</td></tr>';
+        document.getElementById('tbody').innerHTML = '<tr><td colspan="10" style="color:#ef4444;text-align:center;">Network error loading portal.</td></tr>';
+        if (btn) btn.textContent = 'ENTER PORTAL 👑';
       }
     }
 
