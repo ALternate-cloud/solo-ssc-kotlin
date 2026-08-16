@@ -66,11 +66,45 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _countdownToMidnight = MutableStateFlow(DailyQuestEngine.getTimeUntilMidnight())
     val countdownToMidnight: StateFlow<String> = _countdownToMidnight.asStateFlow()
 
+    // App Update state (non-forced)
+    private val currentVersionCode = 1
+    private val _appUpdateInfo = MutableStateFlow<com.sololeveling.sscprep.network.AppVersionResponse?>(null)
+    val appUpdateInfo: StateFlow<com.sololeveling.sscprep.network.AppVersionResponse?> = _appUpdateInfo.asStateFlow()
+
+    private val _showUpdateDialog = MutableStateFlow(false)
+    val showUpdateDialog: StateFlow<Boolean> = _showUpdateDialog.asStateFlow()
+
     init {
+        // Daily reset timer loop
         viewModelScope.launch {
             while (true) {
                 delay(1000)
                 _countdownToMidnight.value = DailyQuestEngine.getTimeUntilMidnight()
+            }
+        }
+
+        // Silent background check for optional updates on startup
+        checkForUpdates(manual = false)
+    }
+
+    fun dismissUpdateDialog() {
+        _showUpdateDialog.value = false
+    }
+
+    fun checkForUpdates(manual: Boolean = false) {
+        viewModelScope.launch {
+            try {
+                val versionInfo = com.sololeveling.sscprep.network.ApiClient.apiService.checkAppVersion()
+                if (versionInfo.success && versionInfo.latestVersionCode > currentVersionCode) {
+                    _appUpdateInfo.value = versionInfo
+                    _showUpdateDialog.value = true
+                } else if (manual) {
+                    showBanner("System is up to date (v1.0.0)")
+                }
+            } catch (e: Exception) {
+                if (manual) {
+                    showBanner("Could not reach update server.")
+                }
             }
         }
     }

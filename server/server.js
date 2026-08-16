@@ -253,6 +253,17 @@ const server = http.createServer((req, res) => {
     return sendJson(200, { status: 'online', system: 'Solo Leveling Exam Monarch Backend', timestamp: new Date().toISOString() });
   }
 
+  // 0. APP VERSION CHECK
+  if (pathname === '/api/version' && req.method === 'GET') {
+    return sendJson(200, {
+      success: true,
+      latestVersionCode: 1,
+      latestVersionName: "1.0.0",
+      downloadUrl: "https://github.com/ALternate-cloud/solo-ssc-kotlin/actions",
+      changelog: "• Online Multiplayer & Hunter Cloud Sync\n• Live National Leaderboard Rankings\n• SSC CGL 2025 Tier-2 PYQ Mock Raids\n• Shadow Mistake Extraction (ARISE)\n• Pomodoro Focus Sanctum"
+    });
+  }
+
   // 1. AUTH: REGISTER
   if (pathname === '/api/auth/register' && req.method === 'POST') {
     readBody((err, body) => {

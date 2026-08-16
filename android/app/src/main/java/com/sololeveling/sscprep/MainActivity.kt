@@ -108,6 +108,9 @@ fun MainAppScaffold(viewModel: MainViewModel, onLogout: () -> Unit = {}) {
     val activeRaid by viewModel.activeRaidSession.collectAsState()
     val playerState by viewModel.playerState.collectAsState()
     val bannerMessage by viewModel.systemBannerMessage.collectAsState()
+    val showUpdateDialog by viewModel.showUpdateDialog.collectAsState()
+    val appUpdateInfo by viewModel.appUpdateInfo.collectAsState()
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     // If a raid session is currently running, jump straight to CBT screen
     LaunchedEffect(activeRaid) {
@@ -319,6 +322,11 @@ fun MainAppScaffold(viewModel: MainViewModel, onLogout: () -> Unit = {}) {
                     showGuildDrawer = false
                 }
 
+                GuildMenuItem("Check for Updates", "⚡", "Check for new questions & patches", SystemPrimary) {
+                    showGuildDrawer = false
+                    viewModel.checkForUpdates(manual = true)
+                }
+
                 HorizontalDivider(color = SystemBorder)
 
                 GuildMenuItem("Logout", "🚪", "Sign out of your hunter account", SystemCrimson) {
@@ -329,6 +337,76 @@ fun MainAppScaffold(viewModel: MainViewModel, onLogout: () -> Unit = {}) {
                 Spacer(modifier = Modifier.height(16.dp))
             }
         }
+    }
+
+    // Optional App Update Notification Dialog
+    if (showUpdateDialog && appUpdateInfo != null) {
+        val info = appUpdateInfo!!
+        AlertDialog(
+            onDismissRequest = { viewModel.dismissUpdateDialog() },
+            containerColor = SystemSurface,
+            title = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("⚡", fontSize = 20.sp)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "SYSTEM UPDATE AVAILABLE",
+                        color = SystemPrimary,
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+            },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        text = "Version ${info.latestVersionName} is now available.",
+                        color = TextPrimary,
+                        fontWeight = FontWeight.SemiBold,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    if (info.changelog.isNotBlank()) {
+                        Text(
+                            text = "What's New:",
+                            color = SystemPurple,
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Text(
+                            text = info.changelog,
+                            color = TextSecondary,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        viewModel.dismissUpdateDialog()
+                        if (info.downloadUrl.isNotBlank()) {
+                            try {
+                                val intent = android.content.Intent(
+                                    android.content.Intent.ACTION_VIEW,
+                                    android.net.Uri.parse(info.downloadUrl)
+                                )
+                                context.startActivity(intent)
+                            } catch (e: Exception) {
+                                // Fallback
+                            }
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = SystemPrimary)
+                ) {
+                    Text("UPDATE NOW ⚡", color = SystemBg, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { viewModel.dismissUpdateDialog() }) {
+                    Text("REMIND ME LATER", color = TextSecondary)
+                }
+            }
+        )
     }
 }
 

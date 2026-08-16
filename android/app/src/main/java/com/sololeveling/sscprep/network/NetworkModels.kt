@@ -17,6 +17,15 @@ data class AuthResponse(
 )
 
 @Serializable
+data class AppVersionResponse(
+    val success: Boolean = true,
+    val latestVersionCode: Int = 1,
+    val latestVersionName: String = "1.0.0",
+    val downloadUrl: String = "",
+    val changelog: String = ""
+)
+
+@Serializable
 data class UserResponse(
     val success: Boolean,
     val user: UserDto? = null

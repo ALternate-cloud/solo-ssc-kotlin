@@ -22,4 +22,7 @@ interface ApiService {
 
     @GET("api/leaderboard")
     suspend fun getLeaderboard(): LeaderboardResponse
+
+    @GET("api/version")
+    suspend fun checkAppVersion(): AppVersionResponse
 }
