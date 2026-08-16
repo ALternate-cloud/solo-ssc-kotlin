@@ -24,6 +24,9 @@ let mongoDbInstance = null;
 
 class DatabaseEngine {
   constructor() {
+    this.cloudStatus = 'not_configured';
+    this.cloudError = null;
+    this.cloudConnectedAt = null;
     this.data = this.load();
     this.seedInitialQuestions();
     this.initCloudDatabase();
@@ -50,31 +53,45 @@ class DatabaseEngine {
   async initCloudDatabase() {
     const uri = process.env.MONGODB_URI;
     if (!uri) {
-      console.log('ℹ️ Running in Standalone Mode. Set MONGODB_URI on Render for permanent multi-server cloud DB.');
+      this.cloudStatus = 'not_configured';
+      this.cloudError = 'MONGODB_URI environment variable is missing on Render. Using ephemeral local disk.';
+      console.log('ℹ️ Running in Standalone Mode. Add MONGODB_URI on Render Environment tab for permanent Cloud storage.');
       return;
     }
+
+    this.cloudStatus = 'connecting';
     try {
       const { MongoClient } = require('mongodb');
-      const client = new MongoClient(uri, { serverSelectionTimeoutMS: 5000 });
+      const client = new MongoClient(uri, { 
+        serverSelectionTimeoutMS: 8000,
+        connectTimeoutMS: 10000 
+      });
       await client.connect();
       mongoDbInstance = client.db('solosystem');
+      this.cloudStatus = 'connected';
+      this.cloudError = null;
+      this.cloudConnectedAt = new Date().toISOString();
       console.log('✓ Successfully connected to Permanent Cloud Database (MongoDB Atlas)!');
 
       // Load cloud state
       const stateDoc = await mongoDbInstance.collection('app_state').findOne({ _id: 'central_state' });
-      if (stateDoc && stateDoc.data) {
+      if (stateDoc && stateDoc.data && Array.isArray(stateDoc.data.users)) {
+        // Merge cloud state
         this.data = stateDoc.data;
         console.log(`✓ Restored ${this.data.users.length} hunter accounts from Cloud Database.`);
       } else {
-        // Initial cloud upload
+        // Initial cloud upload of local state
         await mongoDbInstance.collection('app_state').updateOne(
           { _id: 'central_state' },
           { $set: { data: this.data, updatedAt: new Date() } },
           { upsert: true }
         );
+        console.log(`✓ Initialized cloud database state with ${this.data.users.length} hunters.`);
       }
     } catch (e) {
-      console.error('Cloud DB initialization notice:', e.message);
+      this.cloudStatus = 'error';
+      this.cloudError = e.message;
+      console.error('⚠️ Cloud DB Connection Warning:', e.message);
     }
   }
 
@@ -91,7 +108,10 @@ class DatabaseEngine {
         { _id: 'central_state' },
         { $set: { data: this.data, updatedAt: new Date() } },
         { upsert: true }
-      ).catch(err => console.error('Cloud DB sync error:', err.message));
+      ).catch(err => {
+        this.cloudError = err.message;
+        console.error('Cloud DB sync error:', err.message);
+      });
     }
   }
 
@@ -292,9 +312,32 @@ const server = http.createServer((req, res) => {
 
   // --- API ROUTES ---
 
-  // Health Check
-  if (pathname === '/api/health') {
-    return sendJson(200, { status: 'online', system: 'Solo Leveling Exam Monarch Backend', timestamp: new Date().toISOString() });
+  // Health Check & Database Diagnostic Endpoint
+  if (pathname === '/api/db-status' || pathname === '/api/health') {
+    const rawUri = process.env.MONGODB_URI || '';
+    const maskedUri = rawUri ? rawUri.replace(/:\/\/([^:]+):([^@]+)@/, '://$1:****@') : 'Not Configured';
+
+    return sendJson(200, {
+      serverStatus: 'online',
+      system: 'Solo Leveling Exam Monarch Backend',
+      storageMode: db.cloudStatus === 'connected' ? 'MongoDB Atlas (Permanent Cloud 24/7)' : 'Ephemeral Local Disk (Resets on Restart)',
+      cloudDatabase: {
+        status: db.cloudStatus,
+        configured: !!rawUri,
+        connectionString: maskedUri,
+        lastError: db.cloudError,
+        connectedAt: db.cloudConnectedAt
+      },
+      stats: {
+        totalRegisteredHunters: db.data.users.length,
+        totalQuestions: db.data.questions.length
+      },
+      fixInstructions: db.cloudStatus !== 'connected' ? [
+        '1. Go to https://dashboard.render.com -> your service -> Environment tab',
+        '2. Add variable: Key = MONGODB_URI, Value = your mongodb+srv:// connection string',
+        '3. On MongoDB Atlas (cloud.mongodb.com): Go to Network Access -> Add IP Address -> Select "Allow Access from Anywhere" (0.0.0.0/0)'
+      ] : 'Database is connected and healthy! All user accounts persist permanently.'
+    });
   }
 
   // 0. APP VERSION CHECK
