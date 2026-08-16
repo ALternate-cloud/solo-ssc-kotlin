@@ -11,6 +11,7 @@ val SystemPurple = Color(0xFFC084FC)  // Monarch Violet
 val SystemGold = Color(0xFFFDE047)    // S-Rank Gold
 val SystemCrimson = Color(0xFFF43F5E) // Red Gate Alert
 val SystemSuccess = Color(0xFF4ADE80) // Green Success
+val SystemGreen = Color(0xFF4ADE80)   // Green Stats
 val SystemOrange = Color(0xFFFB923C)  // A-Rank Orange
 val TextPrimary = Color(0xFFF8FAFC)
 val TextSecondary = Color(0xFF94A3B8)
