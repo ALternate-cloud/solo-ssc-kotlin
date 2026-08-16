@@ -693,6 +693,45 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // 9.5 ADMIN: DEVELOPER GOD MODE (/api/admin/god-mode)
+  if (pathname === '/api/admin/god-mode' && req.method === 'POST') {
+    const key = req.headers['x-admin-key'] || parsedUrl.searchParams.get('key');
+    if (key !== ADMIN_MASTER_KEY) {
+      return sendJson(401, { success: false, message: 'Access Denied: Invalid Master Key.' });
+    }
+
+    readBody((err, body) => {
+      if (err) return sendJson(400, { success: false, message: 'Invalid payload.' });
+      const { userId, level, rank, gold, unallocatedPoints, title } = body;
+
+      if (!userId) {
+        return sendJson(400, { success: false, message: 'userId is required.' });
+      }
+
+      if (!db.data.playerProgress[userId]) {
+        db.data.playerProgress[userId] = {};
+      }
+
+      const p = db.data.playerProgress[userId];
+      p.level = level || 100;
+      p.rank = rank || 'Monarch';
+      p.gold = gold !== undefined ? gold : 999999;
+      p.unallocatedPoints = unallocatedPoints !== undefined ? unallocatedPoints : 500;
+      p.title = title || 'The Architect of the System';
+      p.exp = 0;
+      p.maxExp = 10000;
+      p.hp = 1000;
+      p.maxHp = 1000;
+      p.mp = 500;
+      p.maxMp = 500;
+      if (!p.stats) p.stats = { int: 100, vit: 100, agi: 100, sen: 100, str: 100 };
+
+      db.save();
+      return sendJson(200, { success: true, message: `Hunter ascended to Level ${p.level} (${p.rank} Rank)!` });
+    });
+    return;
+  }
+
   // 10. ADMIN: WEB DASHBOARD HTML PORTAL (Password Protected)
   if (pathname === '/admin' && req.method === 'GET') {
     const html = `<!DOCTYPE html>
@@ -777,10 +816,11 @@ const server = http.createServer((req, res) => {
           <th>Mocks</th>
           <th>Streak</th>
           <th>Registered</th>
+          <th>Action</th>
         </tr>
       </thead>
       <tbody id="tbody">
-        <tr><td colspan="9" style="text-align:center; padding:30px;">Loading hunter database...</td></tr>
+        <tr><td colspan="10" style="text-align:center; padding:30px;">Loading hunter database...</td></tr>
       </tbody>
     </table>
   </div>
@@ -807,6 +847,22 @@ const server = http.createServer((req, res) => {
       location.reload();
     }
 
+    async function boostUser(userId, name) {
+      if (!confirm('⚡ Activate Developer God Mode for ' + name + '?\n\n• Level 100\n• Monarch Rank\n• 999,999 Gold\n• 500 Stat Points')) return;
+      try {
+        const res = await fetch('/api/admin/god-mode', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-admin-key': currentKey },
+          body: JSON.stringify({ userId, level: 100, rank: 'Monarch', gold: 999999, unallocatedPoints: 500, title: 'The Architect of the System' })
+        });
+        const data = await res.json();
+        alert(data.message || 'Level 100 Boost Applied!');
+        loadData();
+      } catch(e) {
+        alert('Boost failed: ' + e.message);
+      }
+    }
+
     async function loadData() {
       try {
         const res = await fetch('/api/admin/aspirants', {
@@ -828,7 +884,7 @@ const server = http.createServer((req, res) => {
           document.getElementById('auth-err').style.display = 'block';
         }
       } catch(e) {
-        document.getElementById('tbody').innerHTML = '<tr><td colspan="9" style="color:#ef4444;text-align:center;">Network error.</td></tr>';
+        document.getElementById('tbody').innerHTML = '<tr><td colspan="10" style="color:#ef4444;text-align:center;">Network error.</td></tr>';
       }
     }
 
@@ -842,7 +898,7 @@ const server = http.createServer((req, res) => {
 
       const tbody = document.getElementById('tbody');
       if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:20px; color:#94a3b8;">No hunters found.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:20px; color:#94a3b8;">No hunters found.</td></tr>';
         return;
       }
 
@@ -857,6 +913,7 @@ const server = http.createServer((req, res) => {
           <td>\${u.mockTestsCleared || 0}</td>
           <td>🔥 \${u.streakDays || 1}d</td>
           <td style="font-size:12px; color:#64748b;">\${u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '-'}</td>
+          <td><button onclick="boostUser('\${u.userId}', '\${u.hunterName || u.username}')" class="btn" style="padding:4px 8px; font-size:11px; background:#a855f7; color:#fff;">⚡ Set Lv.100</button></td>
         </tr>
       \`).join('');
     }

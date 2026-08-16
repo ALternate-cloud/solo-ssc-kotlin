@@ -156,6 +156,33 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         soundAndHaptics.playClick()
     }
 
+    fun activateGodMode() {
+        val current = playerState.value
+        val boosted = current.copy(
+            level = 100,
+            rank = "Monarch",
+            gold = current.gold + 999999,
+            unallocatedPoints = current.unallocatedPoints + 500,
+            title = "The Architect of the System",
+            stats = current.stats.copy(
+                intelligence = current.stats.intelligence + 100,
+                vitality = current.stats.vitality + 100,
+                agility = current.stats.agility + 100,
+                sense = current.stats.sense + 100,
+                strength = current.stats.strength + 100
+            ),
+            statsUnlocked = current.statsUnlocked.copy(
+                totalQuestionsSolved = maxOf(current.statsUnlocked.totalQuestionsSolved, 5000),
+                mockTestsCleared = maxOf(current.statsUnlocked.mockTestsCleared, 100),
+                shadowsExtracted = maxOf(current.statsUnlocked.shadowsExtracted, 50)
+            )
+        )
+        repository.updatePlayerState(boosted)
+        soundAndHaptics.playAriseSound()
+        showBanner("👑 DEVELOPER GOD MODE: Level 100 Monarch Activated!")
+        triggerSync()
+    }
+
     fun setPlayerName(name: String) {
         if (name.isNotBlank()) {
             val updated = playerState.value.copy(name = name.trim())

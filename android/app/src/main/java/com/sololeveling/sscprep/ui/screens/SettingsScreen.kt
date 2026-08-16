@@ -36,6 +36,8 @@ fun SettingsScreen(
     var hapticsEnabled by remember { mutableStateOf(viewModel.soundAndHaptics.isHapticsEnabled) }
 
     var showDeleteConfirmDialog by remember { mutableStateOf(false) }
+    var showDevCheatDialog by remember { mutableStateOf(false) }
+    var devTapCount by remember { mutableStateOf(0) }
     var isDeleting by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
@@ -195,7 +197,16 @@ fun SettingsScreen(
             }
             Spacer(modifier = Modifier.height(6.dp))
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        devTapCount++
+                        if (devTapCount >= 5) {
+                            devTapCount = 0
+                            viewModel.soundAndHaptics.playLevelUp()
+                            showDevCheatDialog = true
+                        }
+                    },
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text("Version", color = TextSecondary)
@@ -311,6 +322,56 @@ fun SettingsScreen(
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteConfirmDialog = false }) {
+                    Text("CANCEL", color = TextSecondary)
+                }
+            }
+        )
+    }
+
+    // Secret Developer God-Mode Dialog
+    if (showDevCheatDialog) {
+        AlertDialog(
+            onDismissRequest = { showDevCheatDialog = false },
+            containerColor = SystemSurface,
+            title = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("👑", fontSize = 24.sp)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        "SYSTEM DEVELOPER CONSOLE",
+                        color = SystemGold,
+                        fontWeight = FontWeight.Black
+                    )
+                }
+            },
+            text = {
+                Column {
+                    Text(
+                        text = "Architect clearance recognized. Activate Developer God Mode?",
+                        color = TextPrimary,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text("• Level: 100", color = SystemPrimary, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                    Text("• Hunter Rank: MONARCH 👑", color = SystemPurple, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                    Text("• Gold: +999,999 💰", color = SystemGold, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                    Text("• Unallocated Stat Points: +500 ⚡", color = SystemGreen, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                    Text("• Title: The Architect of the System", color = TextSecondary, fontSize = 12.sp)
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showDevCheatDialog = false
+                        viewModel.activateGodMode()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = SystemPurple)
+                ) {
+                    Text("⚡ ACTIVATE GOD MODE", color = TextPrimary, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDevCheatDialog = false }) {
                     Text("CANCEL", color = TextSecondary)
                 }
             }
