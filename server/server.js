@@ -259,7 +259,7 @@ const server = http.createServer((req, res) => {
       success: true,
       latestVersionCode: 2,
       latestVersionName: "1.1.0",
-      downloadUrl: "https://github.com/ALternate-cloud/solo-ssc-kotlin/actions",
+      downloadUrl: "https://github.com/ALternate-cloud/solo-ssc-kotlin/releases/download/latest/app-debug.apk",
       changelog: "• Added System Settings Menu with Sound & Haptic controls\n• Added Permanent Account Deletion\n• Hunter Cloud Auto-Sync Optimizations"
     });
   }
