@@ -22,20 +22,78 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.sololeveling.sscprep.network.ApiClient
 import com.sololeveling.sscprep.ui.components.RankBadgeChip
 import com.sololeveling.sscprep.ui.screens.*
 import com.sololeveling.sscprep.ui.theme.*
+import com.sololeveling.sscprep.ui.viewmodel.AuthState
+import com.sololeveling.sscprep.ui.viewmodel.AuthViewModel
 import com.sololeveling.sscprep.ui.viewmodel.MainViewModel
 
 class MainActivity : ComponentActivity() {
 
     private val viewModel: MainViewModel by viewModels()
+    private val authViewModel: AuthViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ApiClient.init(applicationContext)
+
         setContent {
             SoloLevelingTheme {
-                MainAppScaffold(viewModel = viewModel)
+                val authState by authViewModel.authState.collectAsState()
+
+                when (authState) {
+                    is AuthState.Loading -> {
+                        // Splash / loading state
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(SystemBg),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text("⚔️", fontSize = 48.sp)
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text(
+                                    "SYSTEM INITIALIZING...",
+                                    color = SystemPrimary,
+                                    fontWeight = FontWeight.Bold,
+                                    letterSpacing = 2.sp
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                                CircularProgressIndicator(color = SystemPrimary)
+                            }
+                        }
+                    }
+                    is AuthState.LoggedOut, is AuthState.Error -> {
+                        // Auth flow
+                        var showRegister by remember { mutableStateOf(false) }
+                        if (showRegister) {
+                            RegisterScreen(
+                                authViewModel = authViewModel,
+                                onNavigateToLogin = { showRegister = false },
+                                onRegisterSuccess = {
+                                    viewModel.pullAndApplyCloudState()
+                                }
+                            )
+                        } else {
+                            LoginScreen(
+                                authViewModel = authViewModel,
+                                onNavigateToRegister = { showRegister = true },
+                                onLoginSuccess = {
+                                    viewModel.pullAndApplyCloudState()
+                                }
+                            )
+                        }
+                    }
+                    is AuthState.LoggedIn -> {
+                        MainAppScaffold(
+                            viewModel = viewModel,
+                            onLogout = { authViewModel.logout() }
+                        )
+                    }
+                }
             }
         }
     }
@@ -43,7 +101,7 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainAppScaffold(viewModel: MainViewModel) {
+fun MainAppScaffold(viewModel: MainViewModel, onLogout: () -> Unit = {}) {
     var currentScreen by remember { mutableStateOf("status") }
     var showGuildDrawer by remember { mutableStateOf(false) }
 
@@ -181,7 +239,7 @@ fun MainAppScaffold(viewModel: MainViewModel) {
                 "focus" -> FocusScreen(viewModel = viewModel)
                 "shop" -> ShopScreen(viewModel = viewModel)
                 "syllabus" -> SyllabusScreen()
-                "leaderboard" -> LeaderboardScreen()
+                "leaderboard" -> LeaderboardScreen(viewModel = viewModel)
             }
 
             // System Alert Notification Banner
@@ -259,6 +317,13 @@ fun MainAppScaffold(viewModel: MainViewModel) {
                 GuildMenuItem("National Leaderboard", "🏆", "Top Aspirant Monarch rankings", SystemGold) {
                     currentScreen = "leaderboard"
                     showGuildDrawer = false
+                }
+
+                HorizontalDivider(color = SystemBorder)
+
+                GuildMenuItem("Logout", "🚪", "Sign out of your hunter account", SystemCrimson) {
+                    showGuildDrawer = false
+                    onLogout()
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))

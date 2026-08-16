@@ -3,18 +3,12 @@
   "version": "1.0.0",
   "description": "Solo Leveling Exam Preparation System with Backend Server & Cloud Sync",
   "main": "server/server.js",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "start": "node server/server.js",
-    "dev": "node server/server.js",
-    "cap:sync": "npx cap sync",
-    "cap:open": "npx cap open android",
-    "cap:run": "npx cap run android"
+    "dev": "node server/server.js"
   },
-  "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "cors": "^2.8.5",
-    "express": "^4.19.2",
-    "jsonwebtoken": "^9.0.2",
-    "better-sqlite3": "^11.8.1"
-  }
+  "dependencies": {}
 }

@@ -14,6 +14,8 @@ import com.sololeveling.sscprep.domain.engine.PlayerEngine
 import com.sololeveling.sscprep.domain.engine.ShadowEngine
 import com.sololeveling.sscprep.domain.engine.ShopEngine
 import com.sololeveling.sscprep.domain.model.*
+import com.sololeveling.sscprep.sync.SyncManager
+import com.sololeveling.sscprep.sync.SyncStatus
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -26,6 +28,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = SystemRepository(application.applicationContext)
     val soundAndHaptics = SystemSoundAndHaptics(application.applicationContext)
+
+    val syncManager = SyncManager(application)
+    val syncStatus: StateFlow<SyncStatus> = syncManager.syncStatus
 
     val playerState: StateFlow<PlayerState> = repository.playerState
     val questState: StateFlow<DailyQuestState> = repository.questState
@@ -70,6 +75,27 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun pullAndApplyCloudState() {
+        viewModelScope.launch {
+            val cloudState = syncManager.pullFromCloud()
+            if (cloudState != null) {
+                repository.updatePlayerState(cloudState.playerState)
+                repository.updateQuestState(cloudState.questState)
+                repository.updateShadowState(cloudState.shadowState)
+            }
+        }
+    }
+
+    private fun triggerSync() {
+        viewModelScope.launch {
+            syncManager.pushToCloud(
+                playerState = repository.playerState.value,
+                questState = repository.questState.value,
+                shadowState = repository.shadowState.value
+            )
+        }
+    }
+
     fun showBanner(msg: String) {
         viewModelScope.launch {
             _systemBannerMessage.value = msg
@@ -87,6 +113,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             repository.updatePlayerState(updated)
             soundAndHaptics.playClick()
         }
+        triggerSync()
     }
 
     fun setTargetPost(postId: String) {
@@ -123,6 +150,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             soundAndHaptics.playLevelUp()
             showBanner("DAILY QUEST CLEARED: +${result.expGained} EXP, +${result.goldGained} Gold, +${result.statPointsGained} Stat Points!")
         }
+        triggerSync()
     }
 
     // --- Dungeons & CBT Raids ---
@@ -272,6 +300,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         } else {
             soundAndHaptics.playAlert()
         }
+        triggerSync()
     }
 
     fun dismissRaid() {
@@ -288,6 +317,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             soundAndHaptics.playAriseSound()
             showBanner("ARISE! Extracted shadow power for ${result.commanderName} (+80 EXP, +30 Gold)")
         }
+        triggerSync()
     }
 
     // --- Pomodoro Focus ---
@@ -336,6 +366,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             soundAndHaptics.playAlert()
             showBanner(result.message)
         }
+        triggerSync()
     }
 
     // --- Bookmarks ---
