@@ -18,12 +18,15 @@ if (!fs.existsSync(DATA_DIR)) {
 }
 
 // ---------------------------------------------------------------------------
-// 1. EMBEDDED PERSISTENT DATABASE ENGINE (JSON / WAL)
+// 1. EMBEDDED & CLOUD PERSISTENT DATABASE ENGINE (MongoDB Atlas / WAL JSON)
 // ---------------------------------------------------------------------------
+let mongoDbInstance = null;
+
 class DatabaseEngine {
   constructor() {
     this.data = this.load();
     this.seedInitialQuestions();
+    this.initCloudDatabase();
   }
 
   load() {
@@ -44,11 +47,51 @@ class DatabaseEngine {
     };
   }
 
+  async initCloudDatabase() {
+    const uri = process.env.MONGODB_URI;
+    if (!uri) {
+      console.log('ℹ️ Running in Standalone Mode. Set MONGODB_URI on Render for permanent multi-server cloud DB.');
+      return;
+    }
+    try {
+      const { MongoClient } = require('mongodb');
+      const client = new MongoClient(uri, { serverSelectionTimeoutMS: 5000 });
+      await client.connect();
+      mongoDbInstance = client.db('solosystem');
+      console.log('✓ Successfully connected to Permanent Cloud Database (MongoDB Atlas)!');
+
+      // Load cloud state
+      const stateDoc = await mongoDbInstance.collection('app_state').findOne({ _id: 'central_state' });
+      if (stateDoc && stateDoc.data) {
+        this.data = stateDoc.data;
+        console.log(`✓ Restored ${this.data.users.length} hunter accounts from Cloud Database.`);
+      } else {
+        // Initial cloud upload
+        await mongoDbInstance.collection('app_state').updateOne(
+          { _id: 'central_state' },
+          { $set: { data: this.data, updatedAt: new Date() } },
+          { upsert: true }
+        );
+      }
+    } catch (e) {
+      console.error('Cloud DB initialization notice:', e.message);
+    }
+  }
+
   save() {
     try {
       fs.writeFileSync(DB_FILE, JSON.stringify(this.data, null, 2), 'utf8');
     } catch (e) {
-      console.error('Failed to save DB:', e);
+      console.error('Failed to save local DB:', e);
+    }
+
+    // Background asynchronous sync to Cloud Database
+    if (mongoDbInstance) {
+      mongoDbInstance.collection('app_state').updateOne(
+        { _id: 'central_state' },
+        { $set: { data: this.data, updatedAt: new Date() } },
+        { upsert: true }
+      ).catch(err => console.error('Cloud DB sync error:', err.message));
     }
   }
 

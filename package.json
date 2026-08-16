@@ -10,5 +10,7 @@
     "start": "node server/server.js",
     "dev": "node server/server.js"
   },
-  "dependencies": {}
+  "dependencies": {
+    "mongodb": "^6.12.0"
+  }
 }
