@@ -852,7 +852,7 @@ const server = http.createServer((req, res) => {
     }
 
     async function boostUser(userId, name) {
-      if (!confirm('⚡ Activate Developer God Mode for ' + name + '?\n\n• Level 100\n• Monarch Rank\n• 999,999 Gold\n• 500 Stat Points')) return;
+      if (!confirm('Activate Developer God Mode for ' + name + '? (Level 100, Monarch Rank, 999,999 Gold)')) return;
       try {
         const res = await fetch('/api/admin/god-mode?key=' + encodeURIComponent(currentKey), {
           method: 'POST',
