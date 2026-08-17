@@ -191,6 +191,56 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    // --- 1v1 Arena Duels ---
+    fun recordArenaMatch(won: Boolean) {
+        val current = playerState.value
+        val currentArena = current.arenaProfile
+        val newElo = if (won) currentArena.eloRating + 25 else maxOf(100, currentArena.eloRating - 10)
+        val newTier = when {
+            newElo >= 2200 -> "Monarch Sovereign 👑"
+            newElo >= 1800 -> "Diamond Duelist 💎"
+            newElo >= 1500 -> "Platinum Duelist ⚔️"
+            newElo >= 1300 -> "Gold Duelist 🏆"
+            newElo >= 1100 -> "Silver Duelist 🛡️"
+            else -> "Bronze Duelist 🗡️"
+        }
+        val goldEarned = if (won) 150 else 30
+        val updatedArena = currentArena.copy(
+            eloRating = newElo,
+            wins = if (won) currentArena.wins + 1 else currentArena.wins,
+            losses = if (!won) currentArena.losses + 1 else currentArena.losses,
+            winStreak = if (won) currentArena.winStreak + 1 else 0,
+            arenaTier = newTier
+        )
+        val updatedPlayer = current.copy(
+            gold = current.gold + goldEarned,
+            arenaProfile = updatedArena
+        )
+        repository.updatePlayerState(updatedPlayer)
+        showBanner(if (won) "⚔️ DUEL VICTORY: +25 ELO & +150 Gold!" else "⚔️ Match Finished: +30 Gold")
+        triggerSync()
+    }
+
+    // --- 100-Floor Demon Castle Tower ---
+    fun recordDemonTowerFloor(floor: Int, bonusPoints: Int, bonusGold: Int) {
+        val current = playerState.value
+        val tower = current.towerState
+        val newHighest = maxOf(tower.highestFloorCleared, floor)
+        val updatedTower = tower.copy(highestFloorCleared = newHighest)
+        val updatedPlayer = current.copy(
+            gold = current.gold + bonusGold,
+            unallocatedPoints = current.unallocatedPoints + bonusPoints,
+            towerState = updatedTower
+        )
+        repository.updatePlayerState(updatedPlayer)
+        if (bonusPoints > 0) {
+            showBanner("👑 DEMON BOSS SLAIN: Floor $floor Cleared! +$bonusPoints STAT POINTS, +$bonusGold Gold!")
+        } else {
+            showBanner("🗼 Floor $floor Cleared! +$bonusGold Gold!")
+        }
+        triggerSync()
+    }
+
     // --- Quests actions ---
     fun toggleTask(taskId: String) {
         val updated = DailyQuestEngine.toggleTaskDirect(questState.value, taskId)

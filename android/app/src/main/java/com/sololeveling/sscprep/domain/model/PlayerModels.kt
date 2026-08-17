@@ -116,6 +116,87 @@ data class HunterMilestones(
 )
 
 @Serializable
+data class ArenaProfile(
+    val eloRating: Int = 1000,
+    val wins: Int = 0,
+    val losses: Int = 0,
+    val winStreak: Int = 0,
+    val arenaTier: String = "Bronze Duelist"
+)
+
+@Serializable
+data class DemonTowerState(
+    val highestFloorCleared: Int = 0,
+    val dailyKeysRemaining: Int = 3,
+    val lastKeyDate: String = ""
+)
+
+@Serializable
+data class ExamTarget(
+    val id: String,
+    val title: String,
+    val shortName: String,
+    val targetDateString: String,
+    val targetTimestampMs: Long,
+    val description: String,
+    val icon: String,
+    val officialPost: String
+)
+
+val OFFICIAL_SSC_EXAMS = listOf(
+    ExamTarget(
+        id = "cgl_tier1_2025",
+        title = "SSC Combined Graduate Level (Tier-1)",
+        shortName = "CGL Tier-1",
+        targetDateString = "Sep 15, 2025",
+        targetTimestampMs = 1757917800000L, // Sep 15, 2025
+        description = "Official Tier-1 Computer Based Test (200 Marks / 60 Mins). Group B & C Gazette and Non-Gazette Ministries.",
+        icon = "🏛️",
+        officialPost = "Income Tax, ASO MEA, GST Inspector"
+    ),
+    ExamTarget(
+        id = "cgl_tier2_2025",
+        title = "SSC CGL Mains Examination (Tier-2)",
+        shortName = "CGL Mains",
+        targetDateString = "Dec 10, 2025",
+        targetTimestampMs = 1765348200000L, // Dec 10, 2025
+        description = "Decisive Merit Battle (390 Marks + Module II Data Entry Speed Test & Computer Proficiency).",
+        icon = "👑",
+        officialPost = "All 4600 & 4200 GP Officers"
+    ),
+    ExamTarget(
+        id = "chsl_2025",
+        title = "SSC Combined Higher Secondary Level",
+        shortName = "SSC CHSL",
+        targetDateString = "Nov 05, 2025",
+        targetTimestampMs = 1762324200000L, // Nov 05, 2025
+        description = "Lower Division Clerk (LDC), Junior Secretariat Assistant (JSA) & Data Entry Operator (DEO).",
+        icon = "📜",
+        officialPost = "Central Secretariat & Ministries"
+    ),
+    ExamTarget(
+        id = "cpo_2025",
+        title = "SSC Central Police Organization",
+        shortName = "SSC CPO",
+        targetDateString = "Oct 20, 2025",
+        targetTimestampMs = 1760941800000L, // Oct 20, 2025
+        description = "Sub-Inspector in Delhi Police, CAPFs (BSF, CISF, CRPF, ITBP, SSB).",
+        icon = "👮",
+        officialPost = "Sub-Inspector (SI)"
+    ),
+    ExamTarget(
+        id = "mts_2025",
+        title = "SSC Multi-Tasking Staff & Havaldar",
+        shortName = "SSC MTS",
+        targetDateString = "Jan 15, 2026",
+        targetTimestampMs = 1768458600000L, // Jan 15, 2026
+        description = "General Central Service Group 'C' Non-Gazetted & Havaldar in CBIC/CBN.",
+        icon = "🏢",
+        officialPost = "Multi-Tasking Staff"
+    )
+)
+
+@Serializable
 data class PlayerState(
     val name: String = "Sung Jin-Aspirant",
     val title: String = "The One Who Overcomes Formulas",
@@ -132,5 +213,7 @@ data class PlayerState(
     val gold: Int = 150,
     val unallocatedPoints: Int = 5,
     val stats: HunterStats = HunterStats(),
-    val milestones: HunterMilestones = HunterMilestones()
+    val milestones: HunterMilestones = HunterMilestones(),
+    val arenaProfile: ArenaProfile = ArenaProfile(),
+    val towerState: DemonTowerState = DemonTowerState()
 )

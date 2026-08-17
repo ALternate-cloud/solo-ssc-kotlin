@@ -84,6 +84,22 @@ data class LeaderboardEntryDto(
 )
 
 @Serializable
+data class ArenaDto(
+    val eloRating: Int = 1000,
+    val wins: Int = 0,
+    val losses: Int = 0,
+    val winStreak: Int = 0,
+    val arenaTier: String = "Bronze Duelist"
+)
+
+@Serializable
+data class DemonTowerDto(
+    val highestFloorCleared: Int = 0,
+    val dailyKeysRemaining: Int = 3,
+    val lastKeyDate: String = ""
+)
+
+@Serializable
 data class PlayerDto(
     val name: String,
     val level: Int,
@@ -98,7 +114,9 @@ data class PlayerDto(
     val unallocatedPoints: Int,
     val title: String,
     val stats: StatsDto,
-    @SerialName("statsUnlocked") val milestones: MilestonesDto
+    @SerialName("statsUnlocked") val milestones: MilestonesDto,
+    val arena: ArenaDto? = null,
+    val tower: DemonTowerDto? = null
 )
 
 @Serializable
@@ -146,7 +164,27 @@ fun PlayerDto.toDomain(): PlayerState {
             shadowsExtracted = milestones.shadowsExtracted,
             streakDays = milestones.streakDays,
             focusMinutes = milestones.focusMinutes
-        )
+        ),
+        arenaProfile = if (arena != null) {
+            ArenaProfile(
+                eloRating = arena.eloRating,
+                wins = arena.wins,
+                losses = arena.losses,
+                winStreak = arena.winStreak,
+                arenaTier = arena.arenaTier
+            )
+        } else {
+            ArenaProfile()
+        },
+        towerState = if (tower != null) {
+            DemonTowerState(
+                highestFloorCleared = tower.highestFloorCleared,
+                dailyKeysRemaining = tower.dailyKeysRemaining,
+                lastKeyDate = tower.lastKeyDate
+            )
+        } else {
+            DemonTowerState()
+        }
     )
 }
 
@@ -177,6 +215,18 @@ fun PlayerState.toDto(): PlayerDto {
             shadowsExtracted = milestones.shadowsExtracted,
             streakDays = milestones.streakDays,
             focusMinutes = milestones.focusMinutes
+        ),
+        arena = ArenaDto(
+            eloRating = arenaProfile.eloRating,
+            wins = arenaProfile.wins,
+            losses = arenaProfile.losses,
+            winStreak = arenaProfile.winStreak,
+            arenaTier = arenaProfile.arenaTier
+        ),
+        tower = DemonTowerDto(
+            highestFloorCleared = towerState.highestFloorCleared,
+            dailyKeysRemaining = towerState.dailyKeysRemaining,
+            lastKeyDate = towerState.lastKeyDate
         )
     )
 }

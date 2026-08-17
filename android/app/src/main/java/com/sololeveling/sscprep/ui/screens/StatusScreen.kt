@@ -23,6 +23,7 @@ import com.sololeveling.sscprep.domain.model.HUNTER_RANKS
 import com.sololeveling.sscprep.domain.model.PlayerState
 import com.sololeveling.sscprep.domain.model.SSC_TARGET_POSTS
 import com.sololeveling.sscprep.domain.model.TargetPost
+import com.sololeveling.sscprep.ui.components.ExamCountdownCard
 import com.sololeveling.sscprep.ui.components.RankBadgeChip
 import com.sololeveling.sscprep.ui.components.SoloGlowingButton
 import com.sololeveling.sscprep.ui.components.StatAllocationRow
@@ -211,6 +212,11 @@ fun StatusScreen(
                     }
                 }
             }
+        }
+
+        // Live National Exam Countdown Ticker
+        item {
+            ExamCountdownCard()
         }
 
         // Target SSC CGL Post Card

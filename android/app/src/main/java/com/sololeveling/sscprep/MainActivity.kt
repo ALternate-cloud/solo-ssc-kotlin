@@ -256,6 +256,14 @@ fun MainAppScaffold(
                 )
                 "shadows" -> ShadowArmyScreen(viewModel = viewModel)
                 "focus" -> FocusScreen(viewModel = viewModel)
+                "duel" -> HunterDuelScreen(
+                    viewModel = viewModel,
+                    onExit = { currentScreen = "status" }
+                )
+                "demon_tower" -> DemonCastleScreen(
+                    viewModel = viewModel,
+                    onExit = { currentScreen = "status" }
+                )
                 "shop" -> ShopScreen(viewModel = viewModel)
                 "syllabus" -> SyllabusScreen()
                 "leaderboard" -> LeaderboardScreen(viewModel = viewModel)
@@ -324,6 +332,14 @@ fun MainAppScaffold(
 
                 GuildMenuItem("Shadow Army & ARISE", "👥", "Mistake extraction & commanders", SystemPurple) {
                     currentScreen = "shadows"
+                    showGuildDrawer = false
+                }
+                GuildMenuItem("Hunter Duel Arena", "⚔️", "1v1 speed clash & ELO rating ladder", SystemCrimson) {
+                    currentScreen = "duel"
+                    showGuildDrawer = false
+                }
+                GuildMenuItem("Demon Castle Tower", "🗼", "100-floor boss gauntlet & Baran raid", SystemPurple) {
+                    currentScreen = "demon_tower"
                     showGuildDrawer = false
                 }
                 GuildMenuItem("Focus Sanctum", "🧘", "Pomodoro deep work study timer", SystemPrimary) {
