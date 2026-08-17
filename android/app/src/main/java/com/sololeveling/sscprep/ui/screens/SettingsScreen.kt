@@ -390,10 +390,11 @@ fun SettingsScreen(
                         Text(
                             text = "👑 Clearance Granted: Welcome Creator. Select a Developer Command:",
                             color = SystemGreen,
-                            fontSize = 13.sp,
+                            fontSize = 12.sp,
                             fontWeight = FontWeight.Bold
                         )
-                        
+
+                        // 1. Level 100 God Mode
                         Button(
                             onClick = {
                                 viewModel.activateGodMode()
@@ -402,29 +403,87 @@ fun SettingsScreen(
                             colors = ButtonDefaults.buttonColors(containerColor = SystemPurple),
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text("⚡ LEVEL 100 MONARCH (+999k Gold, +500 Stats)", color = TextPrimary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            Text("⚡ 1-CLICK LV.100 MONARCH (+999k Gold, +500 Stats)", color = TextPrimary, fontSize = 11.sp, fontWeight = FontWeight.Bold)
                         }
 
-                        Button(
-                            onClick = {
-                                viewModel.recordDemonTowerFloor(100, 15, 5000)
-                                showDevCheatDialog = false
-                            },
-                            colors = ButtonDefaults.buttonColors(containerColor = SystemPrimary),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text("🗼 UNLOCK ALL 100 DEMON CASTLE FLOORS", color = SystemBg, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        // 2. Gold & Stats Booster
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            OutlinedButton(
+                                onClick = { viewModel.devAddGold(100000) },
+                                modifier = Modifier.weight(1f),
+                                border = androidx.compose.foundation.BorderStroke(1.dp, SystemGold)
+                            ) {
+                                Text("+100k Gold 💰", color = SystemGold, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                            }
+                            OutlinedButton(
+                                onClick = { viewModel.devAddStatPoints(100) },
+                                modifier = Modifier.weight(1f),
+                                border = androidx.compose.foundation.BorderStroke(1.dp, SystemPrimary)
+                            ) {
+                                Text("+100 Stats ⚡", color = SystemPrimary, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                            }
                         }
 
-                        Button(
-                            onClick = {
-                                for (i in 1..10) { viewModel.recordArenaMatch(won = true) }
-                                showDevCheatDialog = false
-                            },
-                            colors = ButtonDefaults.buttonColors(containerColor = SystemCrimson),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text("⚔️ BOOST ARENA ELO (+2500 Monarch Sovereign)", color = TextPrimary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        // 3. Level Jump Stepper
+                        Text("Set Custom Level:", color = TextSecondary, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            listOf(1, 25, 50, 80).forEach { lvl ->
+                                OutlinedButton(
+                                    onClick = { viewModel.devSetLevel(lvl) },
+                                    modifier = Modifier.weight(1f),
+                                    border = androidx.compose.foundation.BorderStroke(1.dp, SystemBorder)
+                                ) {
+                                    Text("Lv.$lvl", color = TextPrimary, fontSize = 11.sp)
+                                }
+                            }
+                        }
+
+                        // 4. Demon Castle & Arena
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Button(
+                                onClick = {
+                                    viewModel.devSetDemonTowerFloor(100)
+                                    showDevCheatDialog = false
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = SystemPrimary),
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("🗼 Floor 100", color = SystemBg, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                            }
+                            Button(
+                                onClick = {
+                                    viewModel.devSetArenaElo(2500)
+                                    showDevCheatDialog = false
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = SystemCrimson),
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("⚔️ 2500 ELO", color = TextPrimary, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                            }
+                        }
+
+                        // 5. Shadows & Daily Quests
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Button(
+                                onClick = {
+                                    viewModel.devUnlockAllShadows()
+                                    showDevCheatDialog = false
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = SystemPurple),
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("👥 All Shadows", color = TextPrimary, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                            }
+                            Button(
+                                onClick = {
+                                    viewModel.devCompleteAllQuests()
+                                    showDevCheatDialog = false
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = SystemGreen),
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("📜 Finish Quests", color = SystemBg, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                            }
                         }
                     }
                 }

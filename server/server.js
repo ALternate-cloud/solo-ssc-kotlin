@@ -345,10 +345,10 @@ const server = http.createServer((req, res) => {
   if (pathname === '/api/version' && req.method === 'GET') {
     return sendJson(200, {
       success: true,
-      latestVersionCode: 4,
-      latestVersionName: "1.3.0",
+      latestVersionCode: 5,
+      latestVersionName: "1.3.1",
       downloadUrl: "https://github.com/ALternate-cloud/solo-ssc-kotlin/releases/download/latest/app-debug.apk",
-      changelog: "• ⚔️ 1v1 Hunter Duel Arena: Rapid 5-round speed clash with ELO rating ladder\n• 🗼 100-Floor Demon Castle Tower: Progressive boss gauntlet & Baran final raid\n• ⏱️ Live SSC Exam Countdown: Real-time tickers for CGL Tier-1/Tier-2, CHSL, CPO, MTS"
+      changelog: "• 👑 Password-Protected Architect Developer Console (Full Testing & Debugging Suite)\n• ⚔️ 1v1 Hunter Duel Arena & 🗼 100-Floor Demon Castle Tower\n• ⏱️ Live SSC Exam Countdown Tickers"
     });
   }
 

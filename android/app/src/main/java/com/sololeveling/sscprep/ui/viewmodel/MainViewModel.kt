@@ -183,6 +183,103 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         triggerSync()
     }
 
+    fun devAddGold(amount: Int) {
+        val current = playerState.value
+        val updated = current.copy(gold = maxOf(0, current.gold + amount))
+        repository.updatePlayerState(updated)
+        soundAndHaptics.playClick()
+        showBanner("💰 Developer: Gold updated to ${updated.gold}")
+        triggerSync()
+    }
+
+    fun devAddStatPoints(amount: Int) {
+        val current = playerState.value
+        val updated = current.copy(unallocatedPoints = maxOf(0, current.unallocatedPoints + amount))
+        repository.updatePlayerState(updated)
+        soundAndHaptics.playClick()
+        showBanner("⚡ Developer: Stat points updated to ${updated.unallocatedPoints}")
+        triggerSync()
+    }
+
+    fun devSetLevel(newLevel: Int) {
+        val current = playerState.value
+        val rank = when {
+            newLevel >= 80 -> "Monarch"
+            newLevel >= 60 -> "S"
+            newLevel >= 45 -> "A"
+            newLevel >= 30 -> "B"
+            newLevel >= 15 -> "C"
+            newLevel >= 5 -> "D"
+            else -> "E"
+        }
+        val updated = current.copy(
+            level = newLevel,
+            rank = rank,
+            maxHp = 200 + (newLevel * 25),
+            hp = 200 + (newLevel * 25),
+            maxMp = 130 + (newLevel * 15),
+            mp = 130 + (newLevel * 15)
+        )
+        repository.updatePlayerState(updated)
+        soundAndHaptics.playLevelUp()
+        showBanner("👑 Developer: Level set to $newLevel ($rank Rank)")
+        triggerSync()
+    }
+
+    fun devSetArenaElo(elo: Int) {
+        val current = playerState.value
+        val currentArena = current.arenaProfile
+        val newTier = when {
+            elo >= 2200 -> "Monarch Sovereign 👑"
+            elo >= 1800 -> "Diamond Duelist 💎"
+            elo >= 1500 -> "Platinum Duelist ⚔️"
+            elo >= 1300 -> "Gold Duelist 🏆"
+            elo >= 1100 -> "Silver Duelist 🛡️"
+            else -> "Bronze Duelist 🗡️"
+        }
+        val updated = current.copy(
+            arenaProfile = currentArena.copy(
+                eloRating = elo,
+                arenaTier = newTier
+            )
+        )
+        repository.updatePlayerState(updated)
+        soundAndHaptics.playClick()
+        showBanner("⚔️ Developer: Arena ELO set to $elo ($newTier)")
+        triggerSync()
+    }
+
+    fun devSetDemonTowerFloor(floor: Int) {
+        val current = playerState.value
+        val updated = current.copy(
+            towerState = current.towerState.copy(highestFloorCleared = floor)
+        )
+        repository.updatePlayerState(updated)
+        soundAndHaptics.playClick()
+        showBanner("🗼 Developer: Demon Castle Tower floor set to $floor/100")
+        triggerSync()
+    }
+
+    fun devCompleteAllQuests() {
+        val quests = questState.value
+        val allCompletedTasks = quests.tasks.map { it.copy(isCompleted = true, currentCount = it.targetCount) }
+        val updatedQuests = quests.copy(tasks = allCompletedTasks, allCompleted = true)
+        repository.updateQuestState(updatedQuests)
+        soundAndHaptics.playLevelUp()
+        showBanner("📜 Developer: All Daily Quests auto-completed!")
+        triggerSync()
+    }
+
+    fun devUnlockAllShadows() {
+        val currentArmy = shadowArmyState.value
+        val allShadows = currentArmy.commanders.map { it.copy(isExtracted = true, isDeployed = true) }
+        val updatedArmy = currentArmy.copy(commanders = allShadows)
+        repository.updateShadowArmyState(updatedArmy)
+        soundAndHaptics.playAriseSound()
+        showBanner("👥 Developer: All 6 Shadow Commanders unlocked & extracted!")
+        triggerSync()
+    }
+
     fun setPlayerName(name: String) {
         if (name.isNotBlank()) {
             val updated = playerState.value.copy(name = name.trim())
