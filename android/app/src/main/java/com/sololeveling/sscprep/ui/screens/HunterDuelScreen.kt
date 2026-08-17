@@ -85,46 +85,6 @@ fun HunterDuelScreen(
 
     val coroutineScope = rememberCoroutineScope()
 
-    // 15-second round countdown
-    LaunchedEffect(duelState, currentRound, isTimerRunning) {
-        if (duelState == "battling" && isTimerRunning) {
-            roundTimer = 15
-            while (roundTimer > 0 && !isAnswerSubmitted) {
-                delay(1000)
-                roundTimer--
-            }
-            if (roundTimer == 0 && !isAnswerSubmitted) {
-                // Time up! Player took damage
-                isAnswerSubmitted = true
-                viewModel.soundAndHaptics.playBossRoar()
-                playerHp = maxOf(0, playerHp - 25)
-                delay(1500)
-                advanceRound()
-            }
-        }
-    }
-
-    fun startMatchmaking() {
-        duelState = "matchmaking"
-        viewModel.soundAndHaptics.playClick()
-        coroutineScope.launch {
-            delay(2000) // Radar scan delay
-            val validOpponents = MONARCH_RIVAL_DUELISTS.filter { kotlin.math.abs(it.elo - arena.eloRating) <= 600 }
-            opponent = if (validOpponents.isNotEmpty()) validOpponents.random() else MONARCH_RIVAL_DUELISTS.random()
-            playerHp = 100
-            opponentHp = 100
-            currentRound = 1
-            playerRoundScore = 0
-            opponentRoundScore = 0
-            currentQuestion = InfiniteQuestionGenerator.generateQuantQuestion()
-            selectedOption = null
-            isAnswerSubmitted = false
-            duelState = "battling"
-            isTimerRunning = true
-            viewModel.soundAndHaptics.playAriseSound()
-        }
-    }
-
     fun advanceRound() {
         if (currentRound >= totalRounds || playerHp <= 0 || opponentHp <= 0) {
             // Duel Finished!
@@ -148,6 +108,27 @@ fun HunterDuelScreen(
             selectedOption = null
             isAnswerSubmitted = false
             isTimerRunning = true
+        }
+    }
+
+    fun startMatchmaking() {
+        duelState = "matchmaking"
+        viewModel.soundAndHaptics.playClick()
+        coroutineScope.launch {
+            delay(2000) // Radar scan delay
+            val validOpponents = MONARCH_RIVAL_DUELISTS.filter { kotlin.math.abs(it.elo - arena.eloRating) <= 600 }
+            opponent = if (validOpponents.isNotEmpty()) validOpponents.random() else MONARCH_RIVAL_DUELISTS.random()
+            playerHp = 100
+            opponentHp = 100
+            currentRound = 1
+            playerRoundScore = 0
+            opponentRoundScore = 0
+            currentQuestion = InfiniteQuestionGenerator.generateQuantQuestion()
+            selectedOption = null
+            isAnswerSubmitted = false
+            duelState = "battling"
+            isTimerRunning = true
+            viewModel.soundAndHaptics.playAriseSound()
         }
     }
 
@@ -176,6 +157,25 @@ fun HunterDuelScreen(
         coroutineScope.launch {
             delay(1500)
             advanceRound()
+        }
+    }
+
+    // 15-second round countdown
+    LaunchedEffect(duelState, currentRound, isTimerRunning) {
+        if (duelState == "battling" && isTimerRunning) {
+            roundTimer = 15
+            while (roundTimer > 0 && !isAnswerSubmitted) {
+                delay(1000)
+                roundTimer--
+            }
+            if (roundTimer == 0 && !isAnswerSubmitted) {
+                // Time up! Player took damage
+                isAnswerSubmitted = true
+                viewModel.soundAndHaptics.playBossRoar()
+                playerHp = maxOf(0, playerHp - 25)
+                delay(1500)
+                advanceRound()
+            }
         }
     }
 

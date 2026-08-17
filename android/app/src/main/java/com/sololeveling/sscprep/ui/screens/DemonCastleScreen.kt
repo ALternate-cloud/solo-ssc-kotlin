@@ -75,6 +75,73 @@ fun DemonCastleScreen(
     val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
 
+    fun advanceFloorQuestion() {
+        if (currentQuestionIdx >= questionsList.size - 1) {
+            // Finished 3 questions
+            isTimerActive = false
+            floorClearedSuccess = correctCount >= 2 // 2 out of 3 needed to clear floor
+            viewState = "floor_result"
+            if (floorClearedSuccess) {
+                viewModel.soundAndHaptics.playLevelUp()
+                val boss = TOWER_BOSSES.find { it.floor == activeFloor }
+                viewModel.recordDemonTowerFloor(
+                    floor = activeFloor,
+                    bonusPoints = boss?.bonusStatPoints ?: 0,
+                    bonusGold = boss?.bonusGold ?: (activeFloor * 20)
+                )
+            } else {
+                viewModel.soundAndHaptics.playBossRoar()
+            }
+        } else {
+            currentQuestionIdx++
+            selectedOption = null
+            isSubmitted = false
+            isTimerActive = true
+        }
+    }
+
+    fun startFloor(floor: Int) {
+        activeFloor = floor
+        val diff = when {
+            floor <= 25 -> "Easy"
+            floor <= 60 -> "Medium"
+            else -> "Hard"
+        }
+        questionsList = listOf(
+            InfiniteQuestionGenerator.generateQuantQuestion(diff),
+            InfiniteQuestionGenerator.generateQuantQuestion(diff),
+            InfiniteQuestionGenerator.generateQuantQuestion(diff)
+        )
+        currentQuestionIdx = 0
+        correctCount = 0
+        selectedOption = null
+        isSubmitted = false
+        viewState = "floor_battle"
+        isTimerActive = true
+        viewModel.soundAndHaptics.playClick()
+    }
+
+    fun submitFloorAnswer(optIdx: Int) {
+        if (isSubmitted || currentQuestionIdx >= questionsList.size) return
+        selectedOption = optIdx
+        isSubmitted = true
+        isTimerActive = false
+
+        val q = questionsList[currentQuestionIdx]
+        val isCorrect = optIdx == q.correct
+        if (isCorrect) {
+            correctCount++
+            viewModel.soundAndHaptics.playClick()
+        } else {
+            viewModel.soundAndHaptics.playBossRoar()
+        }
+
+        coroutineScope.launch {
+            delay(1500)
+            advanceFloorQuestion()
+        }
+    }
+
     // Scroll to current unlocked floor
     LaunchedEffect(Unit) {
         val targetIdx = maxOf(0, 100 - (highestCleared + 3))
@@ -101,73 +168,6 @@ fun DemonCastleScreen(
                 delay(1500)
                 advanceFloorQuestion()
             }
-        }
-    }
-
-    fun startFloor(floor: Int) {
-        activeFloor = floor
-        val diff = when {
-            floor <= 25 -> "Easy"
-            floor <= 60 -> "Medium"
-            else -> "Hard"
-        }
-        questionsList = listOf(
-            InfiniteQuestionGenerator.generateQuantQuestion(diff),
-            InfiniteQuestionGenerator.generateQuantQuestion(diff),
-            InfiniteQuestionGenerator.generateQuantQuestion(diff)
-        )
-        currentQuestionIdx = 0
-        correctCount = 0
-        selectedOption = null
-        isSubmitted = false
-        viewState = "floor_battle"
-        isTimerActive = true
-        viewModel.soundAndHaptics.playClick()
-    }
-
-    fun advanceFloorQuestion() {
-        if (currentQuestionIdx >= questionsList.size - 1) {
-            // Finished 3 questions
-            isTimerActive = false
-            floorClearedSuccess = correctCount >= 2 // 2 out of 3 needed to clear floor
-            viewState = "floor_result"
-            if (floorClearedSuccess) {
-                viewModel.soundAndHaptics.playLevelUp()
-                val boss = TOWER_BOSSES.find { it.floor == activeFloor }
-                viewModel.recordDemonTowerFloor(
-                    floor = activeFloor,
-                    bonusPoints = boss?.bonusStatPoints ?: 0,
-                    bonusGold = boss?.bonusGold ?: (activeFloor * 20)
-                )
-            } else {
-                viewModel.soundAndHaptics.playBossRoar()
-            }
-        } else {
-            currentQuestionIdx++
-            selectedOption = null
-            isSubmitted = false
-            isTimerActive = true
-        }
-    }
-
-    fun submitFloorAnswer(optIdx: Int) {
-        if (isSubmitted || currentQuestionIdx >= questionsList.size) return
-        selectedOption = optIdx
-        isSubmitted = true
-        isTimerActive = false
-
-        val q = questionsList[currentQuestionIdx]
-        val isCorrect = optIdx == q.correct
-        if (isCorrect) {
-            correctCount++
-            viewModel.soundAndHaptics.playClick()
-        } else {
-            viewModel.soundAndHaptics.playBossRoar()
-        }
-
-        coroutineScope.launch {
-            delay(1500)
-            advanceFloorQuestion()
         }
     }
 
