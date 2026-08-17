@@ -439,7 +439,7 @@ fun DemonCastleScreen(
                                     SoloGlowingButton(
                                         text = "NEXT FLOOR (${activeFloor + 1}) ⚡",
                                         onClick = { startFloor(activeFloor + 1) },
-                                        color = SystemPurple,
+                                        containerColor = SystemPurple,
                                         modifier = Modifier.fillMaxWidth()
                                     )
                                     Spacer(modifier = Modifier.height(8.dp))

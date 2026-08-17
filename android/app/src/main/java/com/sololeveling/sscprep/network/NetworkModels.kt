@@ -1,6 +1,8 @@
 package com.sololeveling.sscprep.network
 
+import com.sololeveling.sscprep.domain.model.ArenaProfile
 import com.sololeveling.sscprep.domain.model.DailyQuestState
+import com.sololeveling.sscprep.domain.model.DemonTowerState
 import com.sololeveling.sscprep.domain.model.HunterMilestones
 import com.sololeveling.sscprep.domain.model.HunterStats
 import com.sololeveling.sscprep.domain.model.PlayerState

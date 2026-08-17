@@ -242,7 +242,7 @@ fun HunterDuelScreen(
                                     SoloGlowingButton(
                                         text = "FIND RIVAL HUNTER ⚡",
                                         onClick = { startMatchmaking() },
-                                        color = SystemCrimson,
+                                        containerColor = SystemCrimson,
                                         modifier = Modifier.fillMaxWidth()
                                     )
                                 }
@@ -526,7 +526,7 @@ fun HunterDuelScreen(
                                 SoloGlowingButton(
                                     text = "PLAY AGAIN ⚔️",
                                     onClick = { startMatchmaking() },
-                                    color = if (isVictory) SystemGold else SystemCrimson,
+                                    containerColor = if (isVictory) SystemGold else SystemCrimson,
                                     modifier = Modifier.fillMaxWidth()
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
