@@ -271,12 +271,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun devUnlockAllShadows() {
-        val currentArmy = shadowArmyState.value
-        val allShadows = currentArmy.commanders.map { it.copy(isExtracted = true, isDeployed = true) }
-        val updatedArmy = currentArmy.copy(commanders = allShadows)
-        repository.updateShadowArmyState(updatedArmy)
+        val currentArmy = shadowState.value
+        val allShadows = currentArmy.commanders.map { it.copy(extractedCount = 10, level = 10) }
+        val updatedArmy = currentArmy.copy(totalShadows = 500, monarchAuraLevel = 10, commanders = allShadows)
+        repository.updateShadowState(updatedArmy)
         soundAndHaptics.playAriseSound()
-        showBanner("👥 Developer: All 6 Shadow Commanders unlocked & extracted!")
+        showBanner("👥 Developer: All Shadow Commanders unlocked & extracted!")
         triggerSync()
     }
 
