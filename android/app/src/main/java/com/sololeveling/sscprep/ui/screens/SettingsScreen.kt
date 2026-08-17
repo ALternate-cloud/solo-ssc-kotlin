@@ -329,51 +329,132 @@ fun SettingsScreen(
         )
     }
 
-    // Secret Developer God-Mode Dialog
+    var devPasscodeInput by remember { mutableStateOf("") }
+    var isDevKeyUnlocked by remember { mutableStateOf(false) }
+    var devKeyError by remember { mutableStateOf<String?>(null) }
+
+    // Secret Developer God-Mode Dialog (Protected by monarch2026 Master Key)
     if (showDevCheatDialog) {
         AlertDialog(
-            onDismissRequest = { showDevCheatDialog = false },
+            onDismissRequest = {
+                showDevCheatDialog = false
+                devPasscodeInput = ""
+                devKeyError = null
+            },
             containerColor = SystemSurface,
             title = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("👑", fontSize = 24.sp)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        "SYSTEM DEVELOPER CONSOLE",
+                        if (isDevKeyUnlocked) "ARCHITECT GOD CONSOLE" else "DEVELOPER CLEARANCE",
                         color = SystemGold,
                         fontWeight = FontWeight.Black
                     )
                 }
             },
             text = {
-                Column {
-                    Text(
-                        text = "Architect clearance recognized. Activate Developer God Mode?",
-                        color = TextPrimary,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Text("• Level: 100", color = SystemPrimary, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                    Text("• Hunter Rank: MONARCH 👑", color = SystemPurple, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                    Text("• Gold: +999,999 💰", color = SystemGold, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                    Text("• Unallocated Stat Points: +500 ⚡", color = SystemGreen, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                    Text("• Title: The Architect of the System", color = TextSecondary, fontSize = 12.sp)
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    if (!isDevKeyUnlocked) {
+                        Text(
+                            text = "Enter the Architect Master Key to access developer debug and testing controls:",
+                            color = TextPrimary,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        OutlinedTextField(
+                            value = devPasscodeInput,
+                            onValueChange = {
+                                devPasscodeInput = it
+                                devKeyError = null
+                            },
+                            label = { Text("Architect Master Key", color = TextSecondary) },
+                            singleLine = true,
+                            visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(),
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = SystemGold,
+                                unfocusedBorderColor = SystemBorder,
+                                focusedTextColor = TextPrimary,
+                                unfocusedTextColor = TextPrimary
+                            )
+                        )
+                        if (devKeyError != null) {
+                            Text(
+                                text = devKeyError!!,
+                                color = SystemCrimson,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    } else {
+                        Text(
+                            text = "👑 Clearance Granted: Welcome Creator. Select a Developer Command:",
+                            color = SystemGreen,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        
+                        Button(
+                            onClick = {
+                                viewModel.activateGodMode()
+                                showDevCheatDialog = false
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = SystemPurple),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("⚡ LEVEL 100 MONARCH (+999k Gold, +500 Stats)", color = TextPrimary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        }
+
+                        Button(
+                            onClick = {
+                                viewModel.recordDemonTowerFloor(100, 15, 5000)
+                                showDevCheatDialog = false
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = SystemPrimary),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("🗼 UNLOCK ALL 100 DEMON CASTLE FLOORS", color = SystemBg, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        }
+
+                        Button(
+                            onClick = {
+                                for (i in 1..10) { viewModel.recordArenaMatch(won = true) }
+                                showDevCheatDialog = false
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = SystemCrimson),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("⚔️ BOOST ARENA ELO (+2500 Monarch Sovereign)", color = TextPrimary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        }
+                    }
                 }
             },
             confirmButton = {
-                Button(
-                    onClick = {
-                        showDevCheatDialog = false
-                        viewModel.activateGodMode()
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = SystemPurple)
-                ) {
-                    Text("⚡ ACTIVATE GOD MODE", color = TextPrimary, fontWeight = FontWeight.Bold)
+                if (!isDevKeyUnlocked) {
+                    Button(
+                        onClick = {
+                            if (devPasscodeInput.trim() == "monarch2026") {
+                                isDevKeyUnlocked = true
+                                devKeyError = null
+                                viewModel.soundAndHaptics.playLevelUp()
+                            } else {
+                                devKeyError = "⛔ Access Denied: Invalid Security Clearance"
+                                viewModel.soundAndHaptics.playAlert()
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = SystemGold)
+                    ) {
+                        Text("AUTHENTICATE ⚡", color = SystemBg, fontWeight = FontWeight.Bold)
+                    }
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showDevCheatDialog = false }) {
-                    Text("CANCEL", color = TextSecondary)
+                TextButton(onClick = {
+                    showDevCheatDialog = false
+                    devPasscodeInput = ""
+                    devKeyError = null
+                }) {
+                    Text("CLOSE", color = TextSecondary)
                 }
             }
         )
