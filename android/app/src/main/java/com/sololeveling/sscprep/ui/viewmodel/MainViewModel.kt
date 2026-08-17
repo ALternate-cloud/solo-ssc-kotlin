@@ -262,8 +262,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun devCompleteAllQuests() {
         val quests = questState.value
-        val allCompletedTasks = quests.tasks.map { it.copy(isCompleted = true, currentCount = it.targetCount) }
-        val updatedQuests = quests.copy(tasks = allCompletedTasks, allCompleted = true)
+        val allCompletedTasks = quests.tasks.map { it.copy(current = it.target) }
+        val updatedQuests = quests.copy(tasks = allCompletedTasks, penaltyActive = false)
         repository.updateQuestState(updatedQuests)
         soundAndHaptics.playLevelUp()
         showBanner("📜 Developer: All Daily Quests auto-completed!")
