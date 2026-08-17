@@ -100,6 +100,17 @@ class SystemSoundAndHaptics(private val context: Context) {
         }
     }
 
+    fun playBossRoar() {
+        triggerHaptic("heavy")
+        audioScope.launch {
+            // Deep intimidating boss roar chord
+            val notes = listOf(110.0, 98.0, 87.3, 73.4) // A2, G2, F2, D2
+            for (f in notes) {
+                playTone(frequency = f, durationMs = 120, volume = 0.6f)
+            }
+        }
+    }
+
     private fun playTone(frequency: Double, durationMs: Int, volume: Float) {
         if (!isSoundEnabled) return
         try {
