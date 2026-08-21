@@ -166,10 +166,12 @@ fun CbtRaidScreen(
             }
         }
 
-        // Question Content & Options Scrollable Area
+        // Question Content & Options Scrollable Area (Optimized for Android 8 to 15)
         Column(
             modifier = Modifier
                 .weight(1f)
+                .fillMaxWidth()
+                .background(SystemBg)
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
@@ -180,13 +182,13 @@ fun CbtRaidScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Surface(
-                    shape = RoundedCornerShape(4.dp),
-                    color = SystemPrimary.copy(alpha = 0.15f),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, SystemPrimary.copy(alpha = 0.4f))
+                    shape = RoundedCornerShape(6.dp),
+                    color = SystemPrimary.copy(alpha = 0.18f),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, SystemPrimary)
                 ) {
                     Text(
                         text = "${currentQ.subject} • ${currentQ.topic}",
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                         style = MaterialTheme.typography.labelSmall,
                         color = SystemPrimary,
                         fontWeight = FontWeight.Bold
@@ -195,13 +197,13 @@ fun CbtRaidScreen(
 
                 if (isFlagged) {
                     Surface(
-                        shape = RoundedCornerShape(4.dp),
-                        color = SystemPurple.copy(alpha = 0.2f),
+                        shape = RoundedCornerShape(6.dp),
+                        color = SystemPurple.copy(alpha = 0.25f),
                         border = androidx.compose.foundation.BorderStroke(1.dp, SystemPurple)
                     ) {
                         Text(
                             text = "FLAGGED FOR REVIEW",
-                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                             style = MaterialTheme.typography.labelSmall,
                             color = SystemPurple,
                             fontWeight = FontWeight.Bold
@@ -210,35 +212,46 @@ fun CbtRaidScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
-            // Question Text
-            Text(
-                text = currentQ.question,
-                style = MaterialTheme.typography.titleMedium,
-                color = TextPrimary,
-                lineHeight = 22.sp
-            )
+            // High-Contrast Question Container Card
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(10.dp),
+                color = SystemSurfaceElevated,
+                border = androidx.compose.foundation.BorderStroke(1.dp, SystemBorder)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = currentQ.question,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        lineHeight = 24.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Options List
+            // Options List (High Contrast & Touch Target Optimized)
             currentQ.options.forEachIndexed { optIdx, optText ->
                 val isSelected = currentAns == optIdx
+                val bg = if (isSelected) SystemPrimary.copy(alpha = 0.22f) else SystemSurfaceElevated
+                val border = if (isSelected) SystemPrimary else SystemBorder
+
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 5.dp)
                         .clickable { viewModel.selectOption(optIdx) },
-                    shape = RoundedCornerShape(8.dp),
-                    color = if (isSelected) SystemPrimary.copy(alpha = 0.18f) else SystemSurface,
-                    border = androidx.compose.foundation.BorderStroke(
-                        1.dp,
-                        if (isSelected) SystemPrimary else SystemBorder
-                    )
+                    shape = RoundedCornerShape(10.dp),
+                    color = bg,
+                    border = androidx.compose.foundation.BorderStroke(1.dp, border)
                 ) {
                     Row(
-                        modifier = Modifier.padding(14.dp),
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         RadioButton(
@@ -249,13 +262,15 @@ fun CbtRaidScreen(
                                 unselectedColor = SystemBorder
                             )
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(10.dp))
                         val prefix = ('A' + optIdx).toString()
                         Text(
                             text = "($prefix) $optText",
-                            color = if (isSelected) TextPrimary else TextSecondary,
+                            color = if (isSelected) Color.White else Color(0xFFE6EDF3),
                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                            style = MaterialTheme.typography.bodyLarge
+                            fontSize = 15.sp,
+                            lineHeight = 22.sp,
+                            modifier = Modifier.weight(1f)
                         )
                     }
                 }

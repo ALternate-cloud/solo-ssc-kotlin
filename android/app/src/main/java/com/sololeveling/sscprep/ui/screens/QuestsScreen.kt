@@ -1,21 +1,30 @@
 package com.sololeveling.sscprep.ui.screens
 
+import androidx.compose.animation.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sololeveling.sscprep.domain.engine.DailyQuestEngine
+import com.sololeveling.sscprep.domain.engine.InfiniteQuestionGenerator
 import com.sololeveling.sscprep.domain.model.DailyTask
+import com.sololeveling.sscprep.domain.model.Question
 import com.sololeveling.sscprep.ui.components.SoloGlowingButton
 import com.sololeveling.sscprep.ui.components.StatProgressBar
 import com.sololeveling.sscprep.ui.components.SystemWindowCard
@@ -31,6 +40,8 @@ fun QuestsScreen(
     val countdown by viewModel.countdownToMidnight.collectAsState()
     val isAllCompleted = DailyQuestEngine.isAllCompleted(questState)
     val overallPercentage = DailyQuestEngine.getOverallProgressPercentage(questState)
+
+    var activePracticeTask by remember { mutableStateOf<DailyTask?>(null) }
 
     LazyColumn(
         modifier = Modifier
@@ -63,7 +74,7 @@ fun QuestsScreen(
                         }
                         Spacer(modifier = Modifier.height(6.dp))
                         Text(
-                            text = "You failed to complete yesterday's daily study quota! Complete today's tasks immediately to clear the penalty and avoid stat decay.",
+                            text = "You missed yesterday's study quota! Complete today's training drills to clear the penalty and avoid stat decay.",
                             color = TextPrimary,
                             style = MaterialTheme.typography.bodyMedium
                         )
@@ -88,7 +99,7 @@ fun QuestsScreen(
                             fontWeight = FontWeight.Black
                         )
                         Text(
-                            text = "PREPARING FOR SSC CGL",
+                            text = "DAILY SYSTEM DRILLS",
                             style = MaterialTheme.typography.headlineMedium,
                             color = TextPrimary
                         )
@@ -96,7 +107,7 @@ fun QuestsScreen(
                     Surface(
                         shape = RoundedCornerShape(8.dp),
                         color = SystemSurfaceElevated,
-                        border = androidx.compose.foundation.BorderStroke(1.dp, SystemGold)
+                        border = BorderStroke(1.dp, SystemGold)
                     ) {
                         Row(
                             modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
@@ -138,7 +149,7 @@ fun QuestsScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
                 StatProgressBar(
-                    label = "DAILY PROGRESS",
+                    label = "DAILY GOAL PROGRESS",
                     current = overallPercentage,
                     max = 100,
                     barColor = if (isAllCompleted) SystemSuccess else SystemPrimary
@@ -146,7 +157,7 @@ fun QuestsScreen(
             }
         }
 
-        // Daily Tasks List
+        // Daily Tasks List with Interactive Training Drills
         items(questState.tasks.size) { idx ->
             val task = questState.tasks[idx]
             val isDone = task.current >= task.target
@@ -174,15 +185,36 @@ fun QuestsScreen(
                         )
                     }
 
-                    Checkbox(
-                        checked = isDone,
-                        onCheckedChange = { viewModel.toggleTask(task.id) },
-                        colors = CheckboxDefaults.colors(
-                            checkedColor = SystemSuccess,
-                            uncheckedColor = SystemBorder,
-                            checkmarkColor = SystemBg
-                        )
-                    )
+                    if (isDone) {
+                        Surface(
+                            shape = RoundedCornerShape(6.dp),
+                            color = SystemSuccess.copy(alpha = 0.2f),
+                            border = BorderStroke(1.dp, SystemSuccess)
+                        ) {
+                            Text(
+                                text = "DONE ✅",
+                                color = SystemSuccess,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 11.sp,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            )
+                        }
+                    } else {
+                        Button(
+                            onClick = {
+                                if (task.id == "t_focus") {
+                                    onStartPomodoro()
+                                } else {
+                                    activePracticeTask = task
+                                }
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = SystemPrimary),
+                            shape = RoundedCornerShape(6.dp),
+                            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp)
+                        ) {
+                            Text("TRAIN ⚡", color = SystemBg, fontWeight = FontWeight.Bold, fontSize = 11.sp)
+                        }
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -195,7 +227,7 @@ fun QuestsScreen(
             }
         }
 
-        // Deep Focus Quick Launcher Card
+        // Deep Focus Sanctum Card
         item {
             SystemWindowCard(borderColor = SystemPurple) {
                 Row(
@@ -211,7 +243,7 @@ fun QuestsScreen(
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "Launch 25-min deep study session with ambient focus binaural alpha waves.",
+                            text = "Launch deep study timer with ambient alpha waves (+1 min towards daily quota per min).",
                             color = TextSecondary,
                             style = MaterialTheme.typography.bodyMedium
                         )
@@ -220,13 +252,13 @@ fun QuestsScreen(
                         onClick = onStartPomodoro,
                         colors = ButtonDefaults.buttonColors(containerColor = SystemPurple)
                     ) {
-                        Text("ENTER", color = SystemBg, fontWeight = FontWeight.Bold)
+                        Text("ENTER 🧘", color = SystemBg, fontWeight = FontWeight.Bold)
                     }
                 }
             }
         }
 
-        // Claim Rewards Action
+        // Claim Rewards Action Button
         item {
             val canClaim = isAllCompleted && !questState.claimed
             SoloGlowingButton(
@@ -239,4 +271,191 @@ fun QuestsScreen(
             )
         }
     }
+
+    // Interactive Quest Practice Modal
+    activePracticeTask?.let { task ->
+        QuestPracticeModal(
+            task = task,
+            onDismiss = { activePracticeTask = null },
+            onAnswerCorrect = {
+                viewModel.incrementTask(task.id, 1)
+                viewModel.soundAndHaptics.playClick()
+            }
+        )
+    }
+}
+
+@Composable
+fun QuestPracticeModal(
+    task: DailyTask,
+    onDismiss: () -> Unit,
+    onAnswerCorrect: () -> Unit
+) {
+    val subject = when (task.id) {
+        "t_quant" -> "Quantitative Aptitude"
+        "t_reas" -> "General Intelligence & Reasoning"
+        "t_eng" -> "English Language"
+        else -> "General Awareness"
+    }
+
+    var question by remember { mutableStateOf(InfiniteQuestionGenerator.generateBySubject(subject)) }
+    var selectedOption by remember { mutableStateOf<Int?>(null) }
+    var isSubmitted by remember { mutableStateOf(false) }
+    var streakCount by remember { mutableStateOf(0) }
+
+    fun nextQuestion() {
+        question = InfiniteQuestionGenerator.generateBySubject(subject)
+        selectedOption = null
+        isSubmitted = false
+    }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = SystemSurface,
+        title = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text(
+                        text = "[QUEST DRILL: ${task.name.take(20)}...]",
+                        color = SystemPrimary,
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Black
+                    )
+                    Text(
+                        text = "${task.current} / ${task.target} Cleared ⚡",
+                        color = SystemGold,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                IconButton(onClick = onDismiss) {
+                    Icon(Icons.Default.Close, contentDescription = "Close", tint = TextSecondary)
+                }
+            }
+        },
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                // Topic tag
+                Surface(
+                    shape = RoundedCornerShape(4.dp),
+                    color = SystemPrimary.copy(alpha = 0.15f),
+                    border = BorderStroke(1.dp, SystemPrimary.copy(alpha = 0.3f))
+                ) {
+                    Text(
+                        text = "${question.subject} • ${question.topic}",
+                        color = SystemPrimary,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                    )
+                }
+
+                // Question text
+                Text(
+                    text = question.question,
+                    color = TextPrimary,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Medium
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                // Options
+                question.options.forEachIndexed { idx, opt ->
+                    val isSelected = selectedOption == idx
+                    val isCorrect = isSubmitted && idx == question.correct
+                    val isWrong = isSubmitted && isSelected && idx != question.correct
+
+                    val bg = when {
+                        isCorrect -> SystemGreen.copy(alpha = 0.2f)
+                        isWrong -> SystemCrimson.copy(alpha = 0.2f)
+                        isSelected -> SystemPrimary.copy(alpha = 0.2f)
+                        else -> SystemSurfaceElevated
+                    }
+
+                    val border = when {
+                        isCorrect -> SystemGreen
+                        isWrong -> SystemCrimson
+                        isSelected -> SystemPrimary
+                        else -> SystemBorder
+                    }
+
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        color = bg,
+                        border = BorderStroke(1.dp, border),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable(enabled = !isSubmitted) {
+                                selectedOption = idx
+                                isSubmitted = true
+                                if (idx == question.correct) {
+                                    streakCount++
+                                    onAnswerCorrect()
+                                }
+                            }
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(10.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = ('A' + idx).toString(),
+                                color = if (isCorrect) SystemGreen else SystemPrimary,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 13.sp
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(text = opt, color = TextPrimary, fontSize = 13.sp)
+                        }
+                    }
+                }
+
+                // Shortcut trick / explanation upon answer
+                if (isSubmitted) {
+                    Surface(
+                        shape = RoundedCornerShape(6.dp),
+                        color = SystemSurfaceElevated,
+                        border = BorderStroke(1.dp, SystemGold.copy(alpha = 0.5f)),
+                        modifier = Modifier.fillMaxWidth().padding(top = 4.dp)
+                    ) {
+                        Column(modifier = Modifier.padding(8.dp)) {
+                            Text(
+                                text = if (selectedOption == question.correct) "✅ CORRECT! +1 Toward Daily Quest" else "❌ WRONG ANSWER",
+                                color = if (selectedOption == question.correct) SystemGreen else SystemCrimson,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 12.sp
+                            )
+                            if (!question.trick.isNullOrBlank()) {
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(text = "⚡ Trick: ${question.trick}", color = SystemGold, fontSize = 11.sp)
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            if (isSubmitted) {
+                Button(
+                    onClick = { nextQuestion() },
+                    colors = ButtonDefaults.buttonColors(containerColor = SystemPrimary)
+                ) {
+                    Text("NEXT QUESTION ⚡", color = SystemBg, fontWeight = FontWeight.Bold)
+                }
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("DONE FOR NOW", color = TextSecondary)
+            }
+        }
+    )
 }

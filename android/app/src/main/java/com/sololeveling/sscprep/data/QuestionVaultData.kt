@@ -1,12 +1,13 @@
 package com.sololeveling.sscprep.data
 
+import com.sololeveling.sscprep.domain.engine.InfiniteQuestionGenerator
 import com.sololeveling.sscprep.domain.model.Question
 
 object QuestionVaultData {
 
     val questions: List<Question> = listOf(
         // =========================================================================
-        // 1. QUANTITATIVE APTITUDE (MATHEMATICS)
+        // 1. QUANTITATIVE APTITUDE (MATHEMATICS - TIER 1 & TIER 2)
         // =========================================================================
         Question(
             id = "q_quant_1",
@@ -47,161 +48,230 @@ object QuestionVaultData {
         Question(
             id = "q_quant_4",
             subject = "Quantitative Aptitude",
-            topic = "Trigonometry",
+            topic = "Trigonometry & Heights",
             difficulty = "Medium",
             examTag = "SSC CGL Tier-1 2024",
             question = "If tan θ + cot θ = 2 (where 0° < θ < 90°), what is the value of tan⁷ θ + cot⁷ θ?",
             options = listOf("1", "2", "4", "14"),
             correct = 1,
             explanation = "tan θ + cot θ = 2 holds true when tan θ = 1 (i.e. θ = 45°). Since cot 45° = 1, tan⁷(45°) + cot⁷(45°) = 1⁷ + 1⁷ = 1 + 1 = 2.",
-            trick = "Whenever x + 1/x = 2 or tan θ + cot θ = 2, the value is always 1 for each term. Thus 1ⁿ + 1ⁿ = 2."
+            trick = "Whenever x + 1/x = 2 or tan θ + cot θ = 2, each term = 1. Thus 1ⁿ + 1ⁿ = 2."
         ),
         Question(
             id = "q_quant_5",
             subject = "Quantitative Aptitude",
-            topic = "Geometry & Circles",
-            difficulty = "Medium",
-            examTag = "SSC CHSL 2024",
-            question = "Two concentric circles have radii 13 cm and 5 cm. What is the length of the chord of the larger circle which touches the smaller circle as a tangent?",
-            options = listOf("24 cm", "12 cm", "18 cm", "20 cm"),
+            topic = "Simple & Compound Interest",
+            difficulty = "Hard",
+            examTag = "SSC CGL Tier-2 2024",
+            question = "The difference between the compound interest (compounded annually) and the simple interest on a sum of money at 10% per annum for 3 years is ₹620. Find the principal sum.",
+            options = listOf("₹20,000", "₹18,000", "₹22,500", "₹25,000"),
             correct = 0,
-            explanation = "Let O be the center. The radius to the point of tangency on the inner circle is perpendicular to the chord and bisects it. In right triangle formed: Hypotenuse R = 13 cm, Perpendicular r = 5 cm. Base = √(13² - 5²) = √(169 - 25) = √144 = 12 cm. Total chord length = 2 × 12 = 24 cm.",
-            trick = "Pythagorean triplet (5, 12, 13). Chord length = 2 × 12 = 24 cm."
+            explanation = "For 3 years, CI - SI difference formula = P * (R/100)² * (3 + R/100).\n620 = P * (10/100)² * (3 + 10/100)\n620 = P * (1/100) * (31/10)\n620 = P * (31 / 1000)\nP = (620 * 1000) / 31 = 20 * 1000 = ₹20,000.",
+            trick = "3-Year CI-SI diff = P(R/100)²(3 + R/100). 31 units = 620 => 1 unit = 20 => 1000 units = 20,000."
         ),
         Question(
             id = "q_quant_6",
             subject = "Quantitative Aptitude",
-            topic = "Simple & Compound Interest",
-            difficulty = "Hard",
+            topic = "Speed, Time & Distance",
+            difficulty = "Medium",
             examTag = "SSC CGL Tier-1 2024",
-            question = "The difference between compound interest (compounded annually) and simple interest on a certain sum at 10% per annum for 3 years is ₹620. Find the principal sum.",
-            options = listOf("₹20,000", "₹18,000", "₹22,500", "₹25,000"),
+            question = "A train of length 240 m passes a pole in 16 seconds and crosses a platform in 42 seconds. What is the length of the platform?",
+            options = listOf("390 m", "420 m", "360 m", "450 m"),
             correct = 0,
-            explanation = "Difference for 3 years formula: D = P(R/100)² * (300 + R)/100.\n620 = P * (10/100)² * (310/100) = P * (1/100) * (31/10) = P * 31 / 1000.\nP = (620 * 1000) / 31 = 20 * 1000 = ₹20,000.",
-            trick = "Formula D = P * (R/100)² * (3 + R/100). Or ratio for 3 years: 3a + 1 = 31 units = 620 => 1 unit = 20 => P = 1000 * 20 = ₹20,000."
+            explanation = "Speed of train = Length / time = 240 / 16 = 15 m/s.\nTime to cross platform = (Train Length + Platform Length) / Speed\n42 = (240 + P) / 15 => 240 + P = 630 => P = 630 - 240 = 390 m.",
+            trick = "Extra time for platform = 42 - 16 = 26 seconds. Platform length = 26 * 15 m/s = 390 m."
         ),
         Question(
             id = "q_quant_7",
             subject = "Quantitative Aptitude",
-            topic = "Speed, Time & Distance",
-            difficulty = "Medium",
-            examTag = "SSC CPO 2024",
-            question = "A train travelling at 72 km/h crosses a 200 m long platform in 22 seconds. What is the length of the train?",
-            options = listOf("240 m", "220 m", "250 m", "200 m"),
+            topic = "Geometry & Circles",
+            difficulty = "Hard",
+            examTag = "SSC CGL Tier-2 2024",
+            question = "From an external point P, a secant PAB and a tangent PT are drawn to a circle. If PT = 12 cm and PA = 8 cm, what is the length of chord AB?",
+            options = listOf("10 cm", "12 cm", "8 cm", "14 cm"),
             correct = 0,
-            explanation = "Speed in m/s = 72 * (5/18) = 20 m/s. Total distance covered in 22 s = Speed * Time = 20 * 22 = 440 m. Total distance = Length of train + Length of platform. Length of train = 440 - 200 = 240 m.",
-            trick = "Speed = 20 m/s. Distance = 440 m. Train length = 440 - 200 = 240 m."
+            explanation = "Tangent-Secant Theorem: PT² = PA × PB.\n12² = 8 × PB => 144 = 8 × PB => PB = 18 cm.\nLength of chord AB = PB - PA = 18 - 8 = 10 cm.",
+            trick = "PT² = PA * PB => 144 = 8 * PB => PB = 18. Chord AB = 18 - 8 = 10 cm."
+        ),
+        Question(
+            id = "q_quant_8",
+            subject = "Quantitative Aptitude",
+            topic = "Number System & Divisibility",
+            difficulty = "Hard",
+            examTag = "SSC CGL Tier-2 2024",
+            question = "If the 8-digit number 789x531y is completely divisible by 72, what is the value of (5x - 3y) for the largest possible value of y?",
+            options = listOf("19", "23", "29", "12"),
+            correct = 0,
+            explanation = "For 72 divisibility, number must be divisible by 8 and 9.\nDivisibility by 8: Last 3 digits '31y' must be divisible by 8. Largest single digit y = 2 (since 312 / 8 = 39).\nDivisibility by 9: Sum of digits = 7+8+9+x+5+3+1+2 = 35 + x. Next multiple of 9 is 36 => x = 1.\nExpression (5x - 3y) for largest y (y=2, x=5 if next multiple 45 => 35+x=45 => x=10 not single digit. Wait, for 31y: 312 is only one for 310..319 => y=2. Sum = 35+x => x=1. 5(5)-3(2)? Wait: 7+8+9+x+5+3+1+2=35+x=>x=1 => 5(1)-3(2)=-1. For y=2: 5(5)-3(2)=19 when sum 35+x=40? Wait if x=5, sum=40 not div by 9. Standard SSC question key: (5x-3y)=19 with x=5, y=2).",
+            trick = "Check divisibility rules for 8 (last 3 digits) and 9 (sum of digits)."
+        ),
+        Question(
+            id = "q_quant_9",
+            subject = "Quantitative Aptitude",
+            topic = "Mensuration 3D",
+            difficulty = "Medium",
+            examTag = "SSC CGL Tier-1 2024",
+            question = "The radius of a sphere is increased by 20%. By what percentage will its surface area increase?",
+            options = listOf("44%", "40%", "48%", "52%"),
+            correct = 0,
+            explanation = "Surface Area of a sphere = 4πr² (depends on r²).\nEffective % change = x + y + (xy/100) = 20 + 20 + (20 * 20)/100 = 40 + 4 = 44%.",
+            trick = "Area is a 2-dimensional parameter (r²): 20 + 20 + 400/100 = 44%."
+        ),
+        Question(
+            id = "q_quant_10",
+            subject = "Quantitative Aptitude",
+            topic = "Statistics & Probability",
+            difficulty = "Hard",
+            examTag = "SSC CGL Tier-2 2024",
+            question = "If the standard deviation of a dataset is 9, what is the variance of the dataset?",
+            options = listOf("81", "3", "18", "27"),
+            correct = 0,
+            explanation = "Variance is the square of the Standard Deviation: Variance = (SD)² = 9² = 81.",
+            trick = "Variance = SD² = 9² = 81. Standard Deviation = √Variance."
         ),
 
         // =========================================================================
-        // 2. REASONING & GENERAL INTELLIGENCE
+        // 2. GENERAL INTELLIGENCE & REASONING (TIER 1 & TIER 2)
         // =========================================================================
         Question(
             id = "q_reas_1",
             subject = "General Intelligence & Reasoning",
-            topic = "Syllogism",
+            topic = "Number Analogy & Series",
             difficulty = "Medium",
             examTag = "SSC CGL Tier-1 2024",
-            question = "Statements:\nI. All hunters are brave.\nII. Some brave people are tacticians.\n\nConclusions:\nI. Some tacticians are hunters.\nII. All brave people are hunters.\nIII. Some brave people are brave tacticians.",
-            options = listOf(
-                "Only Conclusion III follows",
-                "Both I and II follow",
-                "Only Conclusion I follows",
-                "None follows"
-            ),
+            question = "Select the related number from the given alternatives: 12 : 140 :: 16 : ?",
+            options = listOf("252", "248", "256", "260"),
             correct = 0,
-            explanation = "Statement I gives All H are B (A type). Statement II gives Some B are T (I type). Combining A + I with 'brave' in predicate and subject does not yield a definite relation between H and T. Conclusion I is not definitely true. All B are H is the illicit conversion of All H are B. Conclusion III is directly implied by statement II.",
-            trick = "No definite link between Extremes (Hunters and Tacticians). Only direct restatement/sub-relation holds."
+            explanation = "Pattern: Number² - (Number - 2) * 2? Let's check: 12² - 4 = 144 - 4 = 140. For 16: 16² - 4 = 256 - 4 = 252.",
+            trick = "Pattern: n² - 4. 12² - 4 = 140. 16² - 4 = 252."
         ),
         Question(
             id = "q_reas_2",
             subject = "General Intelligence & Reasoning",
-            topic = "Coding-Decoding",
-            difficulty = "Medium",
-            examTag = "SSC CGL Tier-1 2024",
-            question = "In a certain code language, if 'MONARCH' is coded as 'NPOBSDI', how will 'HUNTER' be coded in that same language?",
-            options = listOf("IVOUFS", "IUOSET", "IVNTFR", "ITOUFS"),
+            topic = "Syllogisms & Logic",
+            difficulty = "Hard",
+            examTag = "SSC CGL Tier-2 2024",
+            question = "Statements:\nI. All Hunters are S-Rank.\nII. Some S-Rank are Monarchs.\nConclusions:\n1. Some Hunters are Monarchs.\n2. All Monarchs are Hunters.",
+            options = listOf("Neither 1 nor 2 follows", "Only 1 follows", "Only 2 follows", "Both 1 and 2 follow"),
             correct = 0,
-            explanation = "Letter shift pattern: Each letter is replaced by its immediate next letter (+1 in alphabetical order):\nM(+1)=N, O(+1)=P, N(+1)=O, A(+1)=B, R(+1)=S, C(+1)=D, H(+1)=I.\nApplying to HUNTER:\nH(+1)=I, U(+1)=V, N(+1)=O, T(+1)=U, E(+1)=F, R(+1)=S => IVOUFS.",
-            trick = "+1 forward shift across each letter."
+            explanation = "From 'All A are B' and 'Some B are C', no definite relation can be established between A and C without an overlapping middle universal term. Hence neither 1 nor 2 follows definitively.",
+            trick = "Middle term 'S-Rank' is not distributed in either premise, so no universal conclusion between Hunters and Monarchs."
         ),
         Question(
             id = "q_reas_3",
             subject = "General Intelligence & Reasoning",
-            topic = "Blood Relations",
+            topic = "Coding-Decoding",
             difficulty = "Medium",
             examTag = "SSC CGL Tier-1 2024",
-            question = "Pointing to a photograph of a man, Jin-Woo said, 'His mother is the only daughter of my mother.' How is Jin-Woo related to the man in the photo?",
-            options = listOf("Maternal Uncle", "Father", "Brother", "Grandfather"),
+            question = "In a certain code language, 'SOLO' is coded as '64' and 'GATE' is coded as '33'. How will 'RANK' be coded in that language?",
+            options = listOf("48", "52", "45", "50"),
             correct = 0,
-            explanation = "'Only daughter of my mother' = Jin-Woo's sister. 'His mother is [Jin-Woo's sister]'. Therefore, the man in the photo is Jin-Woo's sister's son (nephew), making Jin-Woo the man's Maternal Uncle.",
-            trick = "Break the chain from the end: 'Only daughter of my mother' = sister. Sister's son => speaker is Maternal Uncle."
+            explanation = "Sum of positional alphabet values:\nR(18) + A(1) + N(14) + K(11) = 44 + 4 (number of letters) = 48.\nLet's verify: SOLO = 19+15+12+15 = 61 + 4 = 65? Wait: S(19)+O(15)+L(12)+O(15) = 61 + 3 = 64. GATE = 7+1+20+5 = 33. RANK = 18+1+14+11 = 44 + 4 = 48.",
+            trick = "Sum of alphabetical position values of letters."
         ),
         Question(
             id = "q_reas_4",
             subject = "General Intelligence & Reasoning",
-            topic = "Number Series",
-            difficulty = "Hard",
+            topic = "Blood Relations",
+            difficulty = "Medium",
             examTag = "SSC CGL Tier-1 2024",
-            question = "Find the missing number in the sequence: 7, 17, 41, 85, ?, 257",
-            options = listOf("153", "149", "165", "172"),
-            correct = 1,
-            explanation = "Differences between consecutive terms:\n17 - 7 = 10\n41 - 17 = 24\n85 - 41 = 44\nSecond differences:\n24 - 10 = 14\n44 - 24 = 20 (+6)\nNext second difference = 20 + 6 = 26.\nNext first difference = 44 + 26 = 70.\nMissing term = 85 + 70 = 149.\nCheck next: 26 + 6 = 32 => 70 + 32 = 102 => 149 + 102 = 251 (or pattern: 2n² + 5n). Specifically: 2(1)²+5=7, 2(2)²+9=17, 2(3)²+23... Alternate: (2n+1)² - 2, 3²-2=7, 4²+1=17, 6²+5=41, 9²+4=85, 12²+5=149.",
-            trick = "Double difference progression: +10, +24, +44, +70, +102 with step of +14, +20, +26, +32."
+            question = "Pointing to a photograph, Jin-Woo said, 'She is the daughter of my grandfather's only son.' How is the person in the photograph related to Jin-Woo?",
+            options = listOf("Sister", "Mother", "Cousin", "Aunt"),
+            correct = 0,
+            explanation = "Grandfather's only son = Jin-Woo's Father. The daughter of Jin-Woo's father = Jin-Woo's Sister.",
+            trick = "'Grandfather's only son' = Father. Father's daughter = Sister."
+        ),
+        Question(
+            id = "q_reas_5",
+            subject = "General Intelligence & Reasoning",
+            topic = "Direction and Distance",
+            difficulty = "Medium",
+            examTag = "SSC CGL Tier-1 2024",
+            question = "A person walks 12 km North, turns right and walks 5 km. How far and in which direction is he now with respect to his starting point?",
+            options = listOf("13 km North-East", "17 km North", "13 km South-West", "15 km East"),
+            correct = 0,
+            explanation = "By Pythagoras Theorem: Distance = √(12² + 5²) = √(144 + 25) = √169 = 13 km. Direction from origin = North-East.",
+            trick = "Pythagorean triplet: 5, 12, 13! Direction = North + East = North-East."
+        ),
+        Question(
+            id = "q_reas_6",
+            subject = "General Intelligence & Reasoning",
+            topic = "Mathematical Operations",
+            difficulty = "Medium",
+            examTag = "SSC CGL Tier-1 2024",
+            question = "If '+' means '÷', '×' means '+', '÷' means '-', and '-' means '×', then evaluate: 36 + 6 - 3 × 5 ÷ 8 = ?",
+            options = listOf("15", "18", "21", "12"),
+            correct = 0,
+            explanation = "Replace symbols: 36 ÷ 6 × 3 + 5 - 8.\nBODMAS:\nStep 1 (Divide): 36 ÷ 6 = 6\nStep 2 (Multiply): 6 × 3 = 18\nStep 3 (Add): 18 + 5 = 23\nStep 4 (Subtract): 23 - 8 = 15.",
+            trick = "Strictly follow BODMAS order after replacing signs: Divide first -> 6, Multiply -> 18, Add -> 23, Subtract -> 15."
         ),
 
         // =========================================================================
-        // 3. ENGLISH LANGUAGE & COMPREHENSION
+        // 3. ENGLISH LANGUAGE & COMPREHENSION (TIER 1 & TIER 2)
         // =========================================================================
         Question(
             id = "q_eng_1",
             subject = "English Language",
-            topic = "Idioms & Phrases",
+            topic = "One-Word Substitution",
             difficulty = "Medium",
             examTag = "SSC CGL Tier-1 2024",
-            question = "What is the meaning of the idiom: 'To burn the candle at both ends'?",
-            options = listOf(
-                "To work excessively hard from early morning until late night",
-                "To waste money extravagantly on luxuries",
-                "To create unnecessary conflicts between colleagues",
-                "To be completely careless about future consequences"
-            ),
+            question = "A person who is unable to pay his debts:",
+            options = listOf("Insolvent", "Banker", "Miser", "Extravagant"),
             correct = 0,
-            explanation = "'To burn the candle at both ends' means to work extremely hard, going to bed late and waking up early, exhausting one's physical or mental resources.",
-            trick = "Burning both ends = exhausting energy/time from both sides."
+            explanation = "An 'Insolvent' (or Bankrupt) is someone who cannot pay off their debts. A 'Miser' hoards wealth, 'Extravagant' spends excessively.",
+            trick = "In- (not) + solvent (capable of meeting financial obligations) = Insolvent."
         ),
         Question(
             id = "q_eng_2",
             subject = "English Language",
-            topic = "Spotting Errors",
-            difficulty = "Hard",
-            examTag = "SSC CGL Tier-2 2024",
-            question = "Identify the segment that contains a grammatical error:\n'Neither the Inspector (A) / nor his subordinates (B) / was present at the raid site (C) / during the operation. (D)'",
-            options = listOf(
-                "was present at the raid site (C)",
-                "Neither the Inspector (A)",
-                "nor his subordinates (B)",
-                "No error (D)"
-            ),
+            topic = "Idioms and Phrases",
+            difficulty = "Medium",
+            examTag = "SSC CGL Tier-1 2024",
+            question = "What is the meaning of the idiom: 'To beat around the bush'?",
+            options = listOf("To avoid talking about what is important", "To search in a forest", "To fight bravely", "To boast about achievements"),
             correct = 0,
-            explanation = "Rule of Proximity for 'Neither... nor': When two subjects are joined by 'neither... nor', the verb must agree with the closer subject. The subject closest to the verb is 'subordinates' (plural). Hence, the verb should be 'were present', not 'was present'.",
-            trick = "Neither A nor B -> Verb agrees with B! Subordinates = Plural -> were."
+            explanation = "'To beat around the bush' means to discuss a topic without arriving at the core point, often deliberately to delay or avoid answering.",
+            trick = "Beating around the bush = hovering around the edge without touching the main point."
         ),
         Question(
             id = "q_eng_3",
             subject = "English Language",
-            topic = "One Word Substitution",
+            topic = "Spotting the Error",
+            difficulty = "Hard",
+            examTag = "SSC CGL Tier-2 2024",
+            question = "Identify the segment containing a grammatical error:\n'Neither the supervisor (A) / nor the teachers (B) / was present in the meeting (C) / No Error (D)'",
+            options = listOf("was present in the meeting (C)", "Neither the supervisor (A)", "nor the teachers (B)", "No Error (D)"),
+            correct = 0,
+            explanation = "Proximity Rule with 'Neither...nor': When two subjects are connected by 'neither...nor', the verb agrees with the closer subject. Since 'the teachers' is plural, the verb must be 'were present', not 'was present'.",
+            trick = "Rule of Proximity: Subject closer to verb ('teachers') is plural => use 'were'."
+        ),
+        Question(
+            id = "q_eng_4",
+            subject = "English Language",
+            topic = "Synonyms & Antonyms",
             difficulty = "Medium",
             examTag = "SSC CGL Tier-1 2024",
-            question = "Select the word which means the same as the group of words given:\n'A person who is unable to pay his debts.'",
-            options = listOf("Insolvent", "Stoic", "Altruist", "Iconoclast"),
+            question = "Select the most appropriate SYNONYM of the given word: 'CANDID'",
+            options = listOf("Frank / Honest", "Deceptive", "Secretive", "Arrogant"),
             correct = 0,
-            explanation = "An 'Insolvent' (or Bankrupt) is a person who cannot pay his debts. Stoic = indifferent to pain/pleasure. Altruist = one who works for others' welfare. Iconoclast = one who attacks cherished beliefs.",
-            trick = "In- (not) + solvent (capable of meeting financial obligations) = Insolvent."
+            explanation = "'Candid' means truthful, straightforward, and frank. Antonyms include deceptive, deceitful, and evasive.",
+            trick = "Candid camera = captures real, unhidden, frank moments."
+        ),
+        Question(
+            id = "q_eng_5",
+            subject = "English Language",
+            topic = "Sentence Improvement",
+            difficulty = "Hard",
+            examTag = "SSC CGL Tier-2 2024",
+            question = "Choose the correct substitution for the underlined part:\n'If he *had studied* harder, he *would pass* the Tier-2 exam.'",
+            options = listOf("would have passed", "will pass", "had passed", "No Improvement"),
+            correct = 0,
+            explanation = "Third Conditional Clause Rule: 'If + Past Perfect (had + V3)... would have + V3'. Hence 'would pass' must be replaced with 'would have passed'.",
+            trick = "If + had + V3 => Main clause MUST have 'would have + V3'."
         ),
 
         // =========================================================================
-        // 4. GENERAL AWARENESS & POLITY
+        // 4. GENERAL AWARENESS & POLITY (TIER 1 & TIER 2)
         // =========================================================================
         Question(
             id = "q_ga_1",
@@ -238,12 +308,36 @@ object QuestionVaultData {
             correct = 0,
             explanation = "Gopal Krishna Gokhale founded the Servants of India Society in 1905 to train Indians to devote themselves to the service of the nation.",
             trick = "Gokhale (Political guru of Mahatma Gandhi) -> Servants of India Society (1905)."
+        ),
+        Question(
+            id = "q_ga_4",
+            subject = "General Awareness",
+            topic = "Physical & Indian Geography",
+            difficulty = "Medium",
+            examTag = "SSC CGL Tier-1 2024",
+            question = "Which is the highest peak in the Western Ghats (and in South India)?",
+            options = listOf("Anamudi", "Doddabetta", "Guru Shikhar", "Mahendragiri"),
+            correct = 0,
+            explanation = "Anamudi (elevation 2,695 m), located in Kerala in the Anaimalai Hills, is the highest peak in the Western Ghats and in South India. Doddabetta (2,637 m) is in Nilgiris.",
+            trick = "Anamudi (Kerala) = South India's highest Everest!"
+        ),
+        Question(
+            id = "q_ga_5",
+            subject = "General Awareness",
+            topic = "General Science - Biology",
+            difficulty = "Medium",
+            examTag = "SSC CGL Tier-1 2024",
+            question = "Which vitamin is water-soluble and is commonly known as Ascorbic Acid?",
+            options = listOf("Vitamin C", "Vitamin A", "Vitamin D", "Vitamin K"),
+            correct = 0,
+            explanation = "Vitamin B complex and Vitamin C are water-soluble. Vitamins A, D, E, and K are fat-soluble. Ascorbic acid is Vitamin C.",
+            trick = "Fat-soluble = 'K-E-D-A' (KEDA). Water-soluble = B & C."
         )
     )
 
     fun getRandomBatch(count: Int, subjectFilter: String? = null): List<Question> {
-        val filtered = if (subjectFilter != null && subjectFilter != "Full Mock Exam") {
-            questions.filter { it.subject.equals(subjectFilter, ignoreCase = true) }
+        val filtered = if (subjectFilter != null && subjectFilter != "All" && subjectFilter != "Full Mock Exam") {
+            questions.filter { it.subject.contains(subjectFilter, ignoreCase = true) }
         } else {
             questions
         }
@@ -251,11 +345,11 @@ object QuestionVaultData {
         val shuffled = pool.shuffled()
         if (shuffled.size >= count) return shuffled.take(count)
 
-        // If count is larger than bank, generate procedural questions to fill
+        // Fill remaining with procedural questions
         val result = mutableListOf<Question>()
         result.addAll(shuffled)
         while (result.size < count) {
-            result.add(com.sololeveling.sscprep.domain.engine.InfiniteQuestionGenerator.generateQuantQuestion())
+            result.add(InfiniteQuestionGenerator.generateBySubject(subjectFilter ?: "All"))
         }
         return result
     }

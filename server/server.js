@@ -345,10 +345,10 @@ const server = http.createServer((req, res) => {
   if (pathname === '/api/version' && req.method === 'GET') {
     return sendJson(200, {
       success: true,
-      latestVersionCode: 5,
-      latestVersionName: "1.3.1",
+      latestVersionCode: 6,
+      latestVersionName: "1.4.0",
       downloadUrl: "https://github.com/ALternate-cloud/solo-ssc-kotlin/releases/download/latest/app-debug.apk",
-      changelog: "• 👑 Password-Protected Architect Developer Console (Full Testing & Debugging Suite)\n• ⚔️ 1v1 Hunter Duel Arena & 🗼 100-Floor Demon Castle Tower\n• ⏱️ Live SSC Exam Countdown Tickers"
+      changelog: "• 🎯 Interactive Daily Quest Drills: Tap to practice Quant, Reasoning & English to complete daily goals\n• 📚 Massive Question Vault & ⚡ Infinite Procedural Training Gauntlet\n• 📱 Crystal-Clear Question Visibility on All Android OS Versions (Android 8 to 15)"
     });
   }
 

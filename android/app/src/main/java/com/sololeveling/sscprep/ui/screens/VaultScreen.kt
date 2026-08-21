@@ -1,6 +1,7 @@
 package com.sololeveling.sscprep.ui.screens
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -11,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -21,7 +23,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sololeveling.sscprep.data.QuestionVaultData
+import com.sololeveling.sscprep.domain.engine.InfiniteQuestionGenerator
 import com.sololeveling.sscprep.domain.model.Question
+import com.sololeveling.sscprep.ui.components.SoloGlowingButton
 import com.sololeveling.sscprep.ui.components.SystemWindowCard
 import com.sololeveling.sscprep.ui.theme.*
 import com.sololeveling.sscprep.ui.viewmodel.MainViewModel
@@ -29,17 +33,20 @@ import com.sololeveling.sscprep.ui.viewmodel.MainViewModel
 @Composable
 fun VaultScreen(viewModel: MainViewModel) {
     val bookmarkedIds by viewModel.bookmarkedQuestions.collectAsState()
+    var currentVaultMode by remember { mutableStateOf("pyq") } // "pyq" or "infinite"
+
     var selectedSubject by remember { mutableStateOf("All") }
     var searchQuery by remember { mutableStateOf("") }
 
     val subjects = listOf("All", "Quantitative Aptitude", "General Intelligence & Reasoning", "English Language", "General Awareness", "Bookmarked")
 
+    // Filtered static questions
     val filteredQuestions = remember(selectedSubject, searchQuery, bookmarkedIds) {
         QuestionVaultData.questions.filter { q ->
             val matchesSubject = when (selectedSubject) {
                 "All" -> true
                 "Bookmarked" -> bookmarkedIds.contains(q.id)
-                else -> q.subject.equals(selectedSubject, ignoreCase = true)
+                else -> q.subject.contains(selectedSubject, ignoreCase = true)
             }
             val matchesSearch = searchQuery.isBlank() ||
                     q.question.contains(searchQuery, ignoreCase = true) ||
@@ -49,6 +56,10 @@ fun VaultScreen(viewModel: MainViewModel) {
         }
     }
 
+    // Infinite Generator State
+    var infiniteSubject by remember { mutableStateOf("Quantitative Aptitude") }
+    var infiniteQuestions by remember { mutableStateOf(InfiniteQuestionGenerator.generateBatch(5, "Quantitative Aptitude")) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -57,68 +68,188 @@ fun VaultScreen(viewModel: MainViewModel) {
     ) {
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Search Bar
-        OutlinedTextField(
-            value = searchQuery,
-            onValueChange = { searchQuery = it },
-            modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text("Search topics, formulas, questions...", color = TextSecondary) },
-            leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search", tint = SystemPrimary) },
-            singleLine = true,
-            shape = RoundedCornerShape(10.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = TextPrimary,
-                unfocusedTextColor = TextPrimary,
-                focusedBorderColor = SystemPrimary,
-                unfocusedBorderColor = SystemBorder,
-                focusedContainerColor = SystemSurface,
-                unfocusedContainerColor = SystemSurface
-            )
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Subject Filter Chips
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding = PaddingValues(vertical = 4.dp)
+        // Top Mode Switcher Tabs
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(SystemSurfaceElevated, RoundedCornerShape(10.dp))
+                .padding(4.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-            items(subjects.size) { idx ->
-                val subject = subjects[idx]
-                val isSelected = subject == selectedSubject
-                Surface(
-                    modifier = Modifier.clickable { selectedSubject = subject },
-                    shape = RoundedCornerShape(8.dp),
-                    color = if (isSelected) SystemPrimary else SystemSurface,
-                    border = androidx.compose.foundation.BorderStroke(1.dp, if (isSelected) SystemPrimary else SystemBorder)
-                ) {
-                    Text(
-                        text = subject,
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                        color = if (isSelected) SystemBg else TextPrimary,
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.labelSmall
-                    )
-                }
+            Button(
+                onClick = { currentVaultMode = "pyq" },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (currentVaultMode == "pyq") SystemPrimary else Color.Transparent
+                ),
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.weight(1f),
+                contentPadding = PaddingValues(vertical = 8.dp)
+            ) {
+                Text(
+                    text = "📚 PYQ VAULT (${QuestionVaultData.questions.size})",
+                    color = if (currentVaultMode == "pyq") SystemBg else TextSecondary,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 12.sp
+                )
+            }
+
+            Button(
+                onClick = { currentVaultMode = "infinite" },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (currentVaultMode == "infinite") SystemGold else Color.Transparent
+                ),
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.weight(1f),
+                contentPadding = PaddingValues(vertical = 8.dp)
+            ) {
+                Text(
+                    text = "⚡ INFINITE GENERATOR",
+                    color = if (currentVaultMode == "infinite") SystemBg else TextSecondary,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 12.sp
+                )
             }
         }
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Question List
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
-            contentPadding = PaddingValues(bottom = 20.dp)
-        ) {
-            items(filteredQuestions.size) { idx ->
-                val q = filteredQuestions[idx]
-                val isBookmarked = bookmarkedIds.contains(q.id)
-                QuestionVaultCard(
-                    question = q,
-                    isBookmarked = isBookmarked,
-                    onToggleBookmark = { viewModel.toggleBookmark(q.id) }
+        if (currentVaultMode == "pyq") {
+            // --- PYQ VAULT MODE ---
+            // Search Bar
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text("Search topics, formulas, questions...", color = TextSecondary) },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search", tint = SystemPrimary) },
+                singleLine = true,
+                shape = RoundedCornerShape(10.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedTextColor = TextPrimary,
+                    unfocusedTextColor = TextPrimary,
+                    focusedBorderColor = SystemPrimary,
+                    unfocusedBorderColor = SystemBorder,
+                    focusedContainerColor = SystemSurface,
+                    unfocusedContainerColor = SystemSurface
                 )
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // Subject Filter Chips
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = PaddingValues(vertical = 4.dp)
+            ) {
+                items(subjects.size) { idx ->
+                    val subject = subjects[idx]
+                    val isSelected = subject == selectedSubject
+                    Surface(
+                        modifier = Modifier.clickable { selectedSubject = subject },
+                        shape = RoundedCornerShape(8.dp),
+                        color = if (isSelected) SystemPrimary else SystemSurface,
+                        border = BorderStroke(1.dp, if (isSelected) SystemPrimary else SystemBorder)
+                    ) {
+                        Text(
+                            text = subject,
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                            color = if (isSelected) SystemBg else TextPrimary,
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // Question List
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(14.dp),
+                contentPadding = PaddingValues(bottom = 20.dp)
+            ) {
+                items(filteredQuestions.size) { idx ->
+                    val q = filteredQuestions[idx]
+                    val isBookmarked = bookmarkedIds.contains(q.id)
+                    QuestionVaultCard(
+                        question = q,
+                        isBookmarked = isBookmarked,
+                        onToggleBookmark = { viewModel.toggleBookmark(q.id) }
+                    )
+                }
+            }
+        } else {
+            // --- INFINITE GENERATOR MODE ---
+            val infiniteSubjects = listOf("Quantitative Aptitude", "General Intelligence & Reasoning", "English Language", "General Awareness", "All-Rounder Mixed")
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(14.dp),
+                contentPadding = PaddingValues(bottom = 24.dp)
+            ) {
+                item {
+                    SystemWindowCard(borderColor = SystemGold, glowEffect = true) {
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text("⚡", fontSize = 20.sp)
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("ENDLESS PROCEDURAL TRAINING", color = SystemGold, fontWeight = FontWeight.Black, style = MaterialTheme.typography.titleMedium)
+                            }
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text("The System dynamically computes fresh numbers, formulas, and options so you can practice infinitely.", color = TextSecondary, fontSize = 12.sp)
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            // Subject Selection Tabs
+                            LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                items(infiniteSubjects.size) { idx ->
+                                    val sub = infiniteSubjects[idx]
+                                    val isSel = sub == infiniteSubject
+                                    Surface(
+                                        shape = RoundedCornerShape(6.dp),
+                                        color = if (isSel) SystemGold else SystemSurfaceElevated,
+                                        border = BorderStroke(1.dp, if (isSel) SystemGold else SystemBorder),
+                                        modifier = Modifier.clickable {
+                                            infiniteSubject = sub
+                                            infiniteQuestions = InfiniteQuestionGenerator.generateBatch(5, sub)
+                                        }
+                                    ) {
+                                        Text(
+                                            text = sub,
+                                            color = if (isSel) SystemBg else TextPrimary,
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 11.sp,
+                                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                        )
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(14.dp))
+
+                            SoloGlowingButton(
+                                text = "GENERATE 5 FRESH QUESTIONS ⚡",
+                                onClick = {
+                                    infiniteQuestions = InfiniteQuestionGenerator.generateBatch(5, infiniteSubject)
+                                    viewModel.soundAndHaptics.playClick()
+                                },
+                                containerColor = SystemGold,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
+                }
+
+                items(infiniteQuestions.size) { idx ->
+                    val q = infiniteQuestions[idx]
+                    val isBookmarked = bookmarkedIds.contains(q.id)
+                    QuestionVaultCard(
+                        question = q,
+                        isBookmarked = isBookmarked,
+                        onToggleBookmark = { viewModel.toggleBookmark(q.id) }
+                    )
+                }
             }
         }
     }
@@ -143,7 +274,7 @@ fun QuestionVaultCard(
             Surface(
                 shape = RoundedCornerShape(4.dp),
                 color = SystemPrimary.copy(alpha = 0.15f),
-                border = androidx.compose.foundation.BorderStroke(1.dp, SystemPrimary.copy(alpha = 0.4f))
+                border = BorderStroke(1.dp, SystemPrimary.copy(alpha = 0.4f))
             ) {
                 Text(
                     text = "${question.subject} • ${question.topic}",
@@ -165,11 +296,11 @@ fun QuestionVaultCard(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Question Text
+        // Question Text (Explicit high-contrast)
         Text(
             text = question.question,
             style = MaterialTheme.typography.bodyLarge,
-            color = TextPrimary,
+            color = Color.White,
             fontWeight = FontWeight.Medium
         )
 
@@ -193,7 +324,7 @@ fun QuestionVaultCard(
                     .clickable { selectedOption = optIdx },
                 shape = RoundedCornerShape(8.dp),
                 color = optionColor.copy(alpha = if (selectedOption != null) 0.2f else 0.5f),
-                border = androidx.compose.foundation.BorderStroke(
+                border = BorderStroke(
                     1.dp,
                     if (selectedOption != null && (isCorrect || isSelected)) optionColor else SystemBorder
                 )
@@ -212,7 +343,7 @@ fun QuestionVaultCard(
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = optText,
-                        color = TextPrimary,
+                        color = Color.White,
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
