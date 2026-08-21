@@ -1,16 +1,16 @@
 package com.sololeveling.sscprep.ui.screens
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Flag
@@ -65,178 +65,263 @@ fun CbtRaidScreen(
     val currentAns = session.answers[session.currentIndex]
     val isFlagged = session.flags[session.currentIndex]
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(SystemBg)
-    ) {
-        // CBT Top Bar
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            color = SystemSurface,
-            border = androidx.compose.foundation.BorderStroke(1.dp, SystemBorder)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 10.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column {
-                    Text(
-                        text = session.gate.name,
-                        style = MaterialTheme.typography.titleMedium,
-                        color = TextPrimary,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = "Question ${session.currentIndex + 1} of ${session.questions.size}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = SystemPrimary
-                    )
+    Scaffold(
+        topBar = {
+            Column(modifier = Modifier.fillMaxWidth().background(SystemSurface)) {
+                // 1. CBT Top Navigation Bar
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = SystemSurface,
+                    border = BorderStroke(1.dp, SystemBorder)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 10.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = session.gate.name,
+                                style = MaterialTheme.typography.titleMedium,
+                                color = TextPrimary,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1
+                            )
+                            Text(
+                                text = "Question ${session.currentIndex + 1} of ${session.questions.size}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = SystemPrimary
+                            )
+                        }
+
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Surface(
+                                shape = RoundedCornerShape(8.dp),
+                                color = if (isTimeWarning) SystemCrimson.copy(alpha = 0.2f) else SystemSurfaceElevated,
+                                border = BorderStroke(
+                                    1.dp,
+                                    if (isTimeWarning) SystemCrimson else SystemBorder
+                                )
+                            ) {
+                                Text(
+                                    text = "⏱️ $timeFormatted",
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                    color = if (isTimeWarning) SystemCrimson else SystemGold,
+                                    fontWeight = FontWeight.Black,
+                                    fontSize = 14.sp
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            IconButton(
+                                onClick = { showPaletteSheet = true },
+                                modifier = Modifier.size(36.dp)
+                            ) {
+                                Icon(Icons.Default.GridView, contentDescription = "Question Palette", tint = SystemPrimary)
+                            }
+                        }
+                    }
                 }
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Surface(
-                        shape = RoundedCornerShape(8.dp),
-                        color = if (isTimeWarning) SystemCrimson.copy(alpha = 0.2f) else SystemSurfaceElevated,
-                        border = androidx.compose.foundation.BorderStroke(
-                            1.dp,
-                            if (isTimeWarning) SystemCrimson else SystemBorder
-                        )
-                    ) {
-                        Text(
-                            text = "⏱️ $timeFormatted",
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                            color = if (isTimeWarning) SystemCrimson else SystemGold,
-                            fontWeight = FontWeight.Black,
-                            fontSize = 14.sp
-                        )
-                    }
+                // 2. Boss HP Combat Header
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = SystemSurfaceElevated,
+                    border = BorderStroke(1.dp, SystemBorder.copy(alpha = 0.5f))
+                ) {
+                    Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(session.gate.bossAvatar, fontSize = 20.sp)
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    text = session.gate.bossName,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = SystemCrimson,
+                                    fontWeight = FontWeight.Bold,
+                                    maxLines = 1
+                                )
+                            }
+                            Text(
+                                text = "+2.0 / -0.50 Marking",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = TextSecondary
+                            )
+                        }
 
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    IconButton(
-                        onClick = { showPaletteSheet = true },
-                        modifier = Modifier.size(36.dp)
-                    ) {
-                        Icon(Icons.Default.GridView, contentDescription = "Question Palette", tint = SystemPrimary)
+                        Spacer(modifier = Modifier.height(4.dp))
+                        StatProgressBar(
+                            label = "BOSS HP",
+                            current = session.bossHp,
+                            max = session.bossMaxHp,
+                            barColor = SystemCrimson
+                        )
                     }
                 }
             }
-        }
+        },
+        bottomBar = {
+            // Bottom Controls Dock
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = SystemSurface,
+                border = BorderStroke(1.dp, SystemBorder)
+            ) {
+                Column(modifier = Modifier.padding(12.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        TextButton(onClick = { viewModel.toggleFlag() }) {
+                            Icon(
+                                Icons.Default.Flag,
+                                contentDescription = "Flag",
+                                tint = if (isFlagged) SystemPurple else TextSecondary,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = if (isFlagged) "UNFLAG" else "FLAG",
+                                color = if (isFlagged) SystemPurple else TextSecondary,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
 
-        // Live Boss Battle Combat Header
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            color = SystemSurfaceElevated,
-            border = androidx.compose.foundation.BorderStroke(1.dp, SystemBorder.copy(alpha = 0.5f))
+                        if (currentAns != null) {
+                            TextButton(onClick = { viewModel.clearOption() }) {
+                                Text("CLEAR RESPONSE", color = SystemCrimson, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                            }
+                        }
+
+                        Button(
+                            onClick = { showSubmitConfirm = true },
+                            colors = ButtonDefaults.buttonColors(containerColor = SystemCrimson),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text("SUBMIT RAID", color = TextPrimary, fontWeight = FontWeight.Bold)
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        OutlinedButton(
+                            onClick = { viewModel.prevQuestion() },
+                            enabled = session.currentIndex > 0,
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(8.dp),
+                            border = BorderStroke(1.dp, SystemBorder)
+                        ) {
+                            Text("PREVIOUS", color = TextPrimary)
+                        }
+
+                        Button(
+                            onClick = {
+                                if (session.currentIndex < session.questions.size - 1) {
+                                    viewModel.nextQuestion()
+                                } else {
+                                    showSubmitConfirm = true
+                                }
+                            },
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(containerColor = SystemPrimary),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text(
+                                text = if (session.currentIndex < session.questions.size - 1) "NEXT ➔" else "FINISH",
+                                color = SystemBg,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                }
+            }
+        },
+        containerColor = SystemBg
+    ) { paddingValues ->
+        // Question & Options LazyColumn (Guaranteed 100% visible on all Android OS versions)
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(horizontal = 16.dp),
+            contentPadding = PaddingValues(top = 12.dp, bottom = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+            // Subject & Flag Bar
+            item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(session.gate.bossAvatar, fontSize = 20.sp)
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = session.gate.bossName,
-                            style = MaterialTheme.typography.labelSmall,
-                            color = SystemCrimson,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                    Text(
-                        text = "SSC CGL Marking: +2.0 / -0.50",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = TextSecondary
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(4.dp))
-                StatProgressBar(
-                    label = "BOSS HP",
-                    current = session.bossHp,
-                    max = session.bossMaxHp,
-                    barColor = SystemCrimson
-                )
-            }
-        }
-
-        // Question Content & Options Scrollable Area (Optimized for Android 8 to 15)
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .background(SystemBg)
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp)
-        ) {
-            // Subject & Topic Tag
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Surface(
-                    shape = RoundedCornerShape(6.dp),
-                    color = SystemPrimary.copy(alpha = 0.18f),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, SystemPrimary)
-                ) {
-                    Text(
-                        text = "${currentQ.subject} • ${currentQ.topic}",
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = SystemPrimary,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-
-                if (isFlagged) {
                     Surface(
                         shape = RoundedCornerShape(6.dp),
-                        color = SystemPurple.copy(alpha = 0.25f),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, SystemPurple)
+                        color = SystemPrimary.copy(alpha = 0.18f),
+                        border = BorderStroke(1.dp, SystemPrimary)
                     ) {
                         Text(
-                            text = "FLAGGED FOR REVIEW",
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            text = "${currentQ.subject} • ${currentQ.topic}",
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                             style = MaterialTheme.typography.labelSmall,
-                            color = SystemPurple,
+                            color = SystemPrimary,
                             fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    if (isFlagged) {
+                        Surface(
+                            shape = RoundedCornerShape(6.dp),
+                            color = SystemPurple.copy(alpha = 0.25f),
+                            border = BorderStroke(1.dp, SystemPurple)
+                        ) {
+                            Text(
+                                text = "FLAGGED FOR REVIEW",
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = SystemPurple,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Question Container Card (High Contrast)
+            item {
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(10.dp),
+                    color = SystemSurfaceElevated,
+                    border = BorderStroke(1.dp, SystemBorder)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            text = currentQ.question,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = Color.White,
+                            fontSize = 16.sp,
+                            lineHeight = 24.sp,
+                            fontWeight = FontWeight.Medium
                         )
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
-
-            // High-Contrast Question Container Card
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(10.dp),
-                color = SystemSurfaceElevated,
-                border = androidx.compose.foundation.BorderStroke(1.dp, SystemBorder)
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = currentQ.question,
-                        style = MaterialTheme.typography.titleMedium,
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        lineHeight = 24.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Options List (High Contrast & Touch Target Optimized)
-            currentQ.options.forEachIndexed { optIdx, optText ->
+            // Options List
+            items(currentQ.options.size) { optIdx ->
+                val optText = currentQ.options[optIdx]
                 val isSelected = currentAns == optIdx
                 val bg = if (isSelected) SystemPrimary.copy(alpha = 0.22f) else SystemSurfaceElevated
                 val border = if (isSelected) SystemPrimary else SystemBorder
@@ -244,11 +329,10 @@ fun CbtRaidScreen(
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 5.dp)
                         .clickable { viewModel.selectOption(optIdx) },
                     shape = RoundedCornerShape(10.dp),
                     color = bg,
-                    border = androidx.compose.foundation.BorderStroke(1.dp, border)
+                    border = BorderStroke(1.dp, border)
                 ) {
                     Row(
                         modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
@@ -271,86 +355,6 @@ fun CbtRaidScreen(
                             fontSize = 15.sp,
                             lineHeight = 22.sp,
                             modifier = Modifier.weight(1f)
-                        )
-                    }
-                }
-            }
-        }
-
-        // Bottom Controls Dock
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            color = SystemSurface,
-            border = androidx.compose.foundation.BorderStroke(1.dp, SystemBorder)
-        ) {
-            Column(modifier = Modifier.padding(12.dp)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    TextButton(onClick = { viewModel.toggleFlag() }) {
-                        Icon(
-                            Icons.Default.Flag,
-                            contentDescription = "Flag",
-                            tint = if (isFlagged) SystemPurple else TextSecondary,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = if (isFlagged) "UNFLAG" else "FLAG",
-                            color = if (isFlagged) SystemPurple else TextSecondary,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-
-                    if (currentAns != null) {
-                        TextButton(onClick = { viewModel.clearOption() }) {
-                            Text("CLEAR RESPONSE", color = SystemCrimson, fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                        }
-                    }
-
-                    Button(
-                        onClick = { showSubmitConfirm = true },
-                        colors = ButtonDefaults.buttonColors(containerColor = SystemCrimson),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Text("SUBMIT RAID", color = TextPrimary, fontWeight = FontWeight.Bold)
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    OutlinedButton(
-                        onClick = { viewModel.prevQuestion() },
-                        enabled = session.currentIndex > 0,
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(8.dp),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, SystemBorder)
-                    ) {
-                        Text("PREVIOUS", color = TextPrimary)
-                    }
-
-                    Button(
-                        onClick = {
-                            if (session.currentIndex < session.questions.size - 1) {
-                                viewModel.nextQuestion()
-                            } else {
-                                showSubmitConfirm = true
-                            }
-                        },
-                        modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(containerColor = SystemPrimary),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Text(
-                            text = if (session.currentIndex < session.questions.size - 1) "NEXT ➔" else "FINISH",
-                            color = SystemBg,
-                            fontWeight = FontWeight.Bold
                         )
                     }
                 }
@@ -428,8 +432,8 @@ fun CbtRaidScreen(
 
     // Submit Confirmation Dialog
     if (showSubmitConfirm) {
-        var answeredCount = session.answers.count { it != null }
-        var unattemptedCount = session.questions.size - answeredCount
+        val answeredCount = session.answers.count { it != null }
+        val unattemptedCount = session.questions.size - answeredCount
 
         AlertDialog(
             onDismissRequest = { showSubmitConfirm = false },

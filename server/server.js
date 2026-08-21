@@ -345,10 +345,10 @@ const server = http.createServer((req, res) => {
   if (pathname === '/api/version' && req.method === 'GET') {
     return sendJson(200, {
       success: true,
-      latestVersionCode: 6,
-      latestVersionName: "1.4.0",
+      latestVersionCode: 7,
+      latestVersionName: "1.4.1",
       downloadUrl: "https://github.com/ALternate-cloud/solo-ssc-kotlin/releases/download/latest/app-debug.apk",
-      changelog: "• 🎯 Interactive Daily Quest Drills: Tap to practice Quant, Reasoning & English to complete daily goals\n• 📚 Massive Question Vault & ⚡ Infinite Procedural Training Gauntlet\n• 📱 Crystal-Clear Question Visibility on All Android OS Versions (Android 8 to 15)"
+      changelog: "• 📱 Universal Android Fix: 100% visible questions & options in CBT Gate Raids & PYQ Papers across Android 8 to 15\n• 🎯 Interactive Daily Quest Drills & ⚡ Infinite Training Generator"
     });
   }
 
